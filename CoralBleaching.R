@@ -88,8 +88,21 @@ ggplot(maj.ble.long, aes(fill = Major_Category, y = Absolute_cover, x = Tran.seq
   coord_flip() + 
   theme_classic()
 
+maj.ble.2022 <- rowSums(maj.ble[,2:4])
+maj.ble.2023 <- rowSums(maj.ble[,5:7])
+Major_Category_Bleached <- maj.ble$Major_Category_Bleached
+maj.ble.yr <- data.frame(Major_Category_Bleached, maj.ble.2022, maj.ble.2023)
+colnames(maj.ble.yr) <- c('Major_Category_Bleached','X2022','X2023')
 
+maj.ble.yr.long <- gather(maj.ble.yr, Year, Absolute_cover, X2022, X2023, factor_key=TRUE)
+Major_Category <- factor(maj.ble.yr.long$Major_Category_Bleached, levels = maj.ble.seq)
+Year. <- factor(maj.ble.yr.long$Year , levels = c('X2023','X2022'))
 
+ggplot(maj.ble.yr.long, aes(fill = Major_Category, y = Absolute_cover, x = Year.)) + 
+  geom_bar(position="fill", stat="identity") +
+  scale_fill_manual(values = maj.ble.col) + 
+  coord_flip() + 
+  theme_classic()
 
 
 # bar plot comparing 2022 and 2023
@@ -245,6 +258,23 @@ ggplot(Coral_long, aes(fill = Coral.seq, y = Relative_cover, x = Tran.seq)) +
   coord_flip() + 
   theme_classic()
 
+
+
+Coral.2022 <- rowSums(Coral[,2:4])
+Coral.2023 <- rowSums(Coral[,5:7])
+SpeciesXMorpho <- Coral$Label
+Coral.yr <- data.frame(SpeciesXMorpho, Coral.2022, Coral.2023)
+colnames(Coral.yr) <- c('SpeciesXMorpho','X2022','X2023')
+
+Coral.yr.long <- gather(Coral.yr, Year, Relative_cover, X2022, X2023, factor_key=TRUE)
+SpeciesXMorpho <- factor(Coral.yr$SpeciesXMorpho, levels = Coral_long.seq)
+Year. <- factor(Coral.yr.long$Year , levels = c('X2023','X2022'))
+
+ggplot(Coral.yr.long, aes(fill = SpeciesXMorpho, y = Relative_cover, x = Year.)) + 
+  geom_bar(position="fill", stat="identity") +
+  scale_fill_manual(values = coral.col) + 
+  coord_flip() + 
+  theme_classic()
 
 
 ### bleaching conditions
@@ -702,7 +732,7 @@ ggplot(data = df)+
   geom_area(data = filter(df, BAA.poi == 3& date > '2022-12-30'), aes(x = date, y = DHW.poi*2), fill = "red", alpha = 0.8) +
   geom_area(data = filter(df, BAA.poi == 4& date > '2022-12-30'), aes(x = date, y = DHW.poi*2), fill = "darkred", alpha = 0.8) +
   
-  scale_y_continuous(name = "Temperature (°C)", breaks=c(5, 10, 15, 20, 25, 30), labels=c(11, 16 ,21, 26, 31, 36), 
+  scale_y_continuous(name = "Temperature (°C)", breaks=c(0, 5, 10, 15, 20, 25, 30), labels=c(6, 11, 16 ,21, 26, 31, 36), limits=c(0,25),
                      sec.axis = sec_axis(~./2, name="DHW (°C-weeks)"), expand = c(0,0))+
   scale_x_date(breaks = date_breaks("1 month"), date_labels="%b")+
   geom_line( aes(x = date, y = sst.poi-6), color = "black", size = 2)+
