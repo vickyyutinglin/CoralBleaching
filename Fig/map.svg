@@ -2,9 +2,9 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   width="210mm"
-   height="140mm"
-   viewBox="0 0 210 140"
+   width="170mm"
+   height="115mm"
+   viewBox="0 0 170 115"
    version="1.1"
    id="svg5"
    inkscape:version="1.1.2 (b8e25be833, 2022-02-05)"
@@ -28,16 +28,59 @@
      showgrid="false"
      height="200mm"
      inkscape:zoom="1.0469406"
-     inkscape:cx="344.33663"
-     inkscape:cy="239.74617"
+     inkscape:cx="299.44392"
+     inkscape:cy="205.36027"
      inkscape:window-width="1920"
      inkscape:window-height="1017"
-     inkscape:window-x="-8"
+     inkscape:window-x="1912"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
-     inkscape:current-layer="g8981" />
+     inkscape:current-layer="g8981"
+     width="209mm" />
   <defs
      id="defs2">
+    <marker
+       style="overflow:visible"
+       id="Arrow2Lend"
+       refX="0"
+       refY="0"
+       orient="auto"
+       inkscape:stockid="Arrow2Lend"
+       inkscape:isstock="true">
+      <path
+         transform="matrix(-1.1,0,0,-1.1,-1.1,0)"
+         d="M 8.7185878,4.0337352 -2.2072895,0.01601326 8.7185884,-4.0017078 c -1.7454984,2.3720609 -1.7354408,5.6174519 -6e-7,8.035443 z"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:0.625;stroke-linejoin:round"
+         id="path7072" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="Arrow1Lend"
+       refX="0"
+       refY="0"
+       orient="auto"
+       inkscape:stockid="Arrow1Lend"
+       inkscape:isstock="true">
+      <path
+         transform="matrix(-0.8,0,0,-0.8,-10,0)"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
+         id="path7054" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="Arrow1Lstart"
+       refX="0"
+       refY="0"
+       orient="auto"
+       inkscape:stockid="Arrow1Lstart"
+       inkscape:isstock="true">
+      <path
+         transform="matrix(0.8,0,0,0.8,10,0)"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
+         id="path7051" />
+    </marker>
     <clipPath
        clipPathUnits="userSpaceOnUse"
        id="clipPath1120">
@@ -101,6 +144,32 @@
          d="m 57.57,31.43 h 551.8 V 449.02 H 57.57 Z"
          id="path17442" />
     </clipPath>
+    <marker
+       style="overflow:visible"
+       id="Arrow2Lend-3"
+       refX="0"
+       refY="0"
+       orient="auto"
+       inkscape:stockid="Arrow2Lend"
+       inkscape:isstock="true">
+      <path
+         transform="matrix(-1.1,0,0,-1.1,-1.1,0)"
+         d="M 8.7185878,4.0337352 -2.2072895,0.01601326 8.7185884,-4.0017078 c -1.7454984,2.3720609 -1.7354408,5.6174519 -6e-7,8.035443 z"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:0.625;stroke-linejoin:round"
+         id="path7072-1" />
+    </marker>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath12798">
+      <rect
+         style="opacity:0.95;fill:#ffed6f;stroke:#000000;stroke-width:1.90949;stroke-linejoin:round;stroke-miterlimit:5.2;stroke-dasharray:none"
+         id="rect12800"
+         width="517.81378"
+         height="344.3645"
+         x="171.65997"
+         y="-535.67999"
+         transform="scale(1,-1)" />
+    </clipPath>
   </defs>
   <g
      inkscape:label="Layer 1"
@@ -132,10 +201,11 @@
          id="g9011" />
       <g
          id="g9013"
-         transform="matrix(0.84799101,0,0,0.84799101,51.710161,-24.574913)"
+         transform="matrix(0.84799101,0,0,0.84799101,-59.909525,-27.440405)"
          inkscape:export-filename="C:\Users\Vicky\OneDrive\R project\CoralBleaching\Fig\map.png"
          inkscape:export-xdpi="300"
-         inkscape:export-ydpi="300">
+         inkscape:export-ydpi="300"
+         clip-path="url(#clipPath12798)">
         <g
            id="g9015"
            clip-path="url(#clipPath9019)">
@@ -8652,7 +8722,7 @@
       </g>
       <g
          id="g13275"
-         transform="matrix(0.84799101,0,0,0.84799101,51.710161,-24.574913)">
+         transform="matrix(0.84799101,0,0,0.84799101,-59.909525,-27.440405)">
         <g
            id="g13277"
            clip-path="url(#clipPath13281)">
@@ -9654,27 +9724,7 @@
          id="g13793" />
       <g
          id="g13795"
-         transform="matrix(0.84799101,0,0,0.84799101,51.710161,-24.574913)">
-        <text
-           transform="scale(1,-1)"
-           style="font-variant:normal;font-weight:normal;font-size:9px;font-family:Helvetica;-inkscape-font-specification:Helvetica;writing-mode:lr-tb;fill:#4d4d4d;fill-opacity:1;fill-rule:nonzero;stroke:none"
-           id="text13799"
-           x="27.351219"
-           y="-103.63"><tspan
-             x="27.351219 32.355221"
-             y="-103.63"
-             sodipodi:role="line"
-             id="tspan13797">10</tspan></text>
-        <text
-           transform="scale(1,-1)"
-           style="font-variant:normal;font-weight:normal;font-size:9px;font-family:Helvetica;-inkscape-font-specification:Helvetica;writing-mode:lr-tb;fill:#4d4d4d;fill-opacity:1;fill-rule:nonzero;stroke:none"
-           id="text13811"
-           x="27.351219"
-           y="-175.11"><tspan
-             x="27.351219 32.355221"
-             y="-175.11"
-             sodipodi:role="line"
-             id="tspan13809">15</tspan></text>
+         transform="matrix(0.84799101,0,0,0.84799101,49.590474,-27.440405)">
         <text
            transform="scale(1,-1)"
            style="font-variant:normal;font-weight:normal;font-size:9px;font-family:Helvetica;-inkscape-font-specification:Helvetica;writing-mode:lr-tb;fill:#4d4d4d;fill-opacity:1;fill-rule:nonzero;stroke:none"
@@ -9732,15 +9782,7 @@
          id="g13883" />
       <g
          id="g13885"
-         transform="matrix(0.84799101,0,0,0.84799101,51.710161,-24.574913)">
-        <path
-           d="M 40.66,106.77 H 43.4"
-           style="fill:none;stroke:#333333;stroke-width:1.07;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
-           id="path13887" />
-        <path
-           d="M 40.66,178.26 H 43.4"
-           style="fill:none;stroke:#333333;stroke-width:1.07;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
-           id="path13889" />
+         transform="matrix(0.84799101,0,0,0.84799101,49.590474,-27.440405)">
         <path
            d="M 40.66,249.74 H 43.4"
            style="fill:none;stroke:#333333;stroke-width:1.07;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
@@ -9784,11 +9826,7 @@
          id="g13919" />
       <g
          id="g13921"
-         transform="matrix(0.84799101,0,0,0.84799101,51.710161,-24.574913)">
-        <path
-           d="m 43.4,104.03 v 2.74"
-           style="fill:none;stroke:#333333;stroke-width:1.07;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
-           id="path13923" />
+         transform="matrix(0.84799101,0,0,0.84799101,-59.909525,44.559595)">
         <path
            d="m 172.98,104.03 v 2.74"
            style="fill:none;stroke:#333333;stroke-width:1.07;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
@@ -9814,17 +9852,7 @@
          id="g13935" />
       <g
          id="g13937"
-         transform="matrix(0.84799101,0,0,0.84799101,51.710161,-24.574913)">
-        <text
-           transform="scale(1,-1)"
-           style="font-variant:normal;font-weight:normal;font-size:9px;font-family:Helvetica;-inkscape-font-specification:Helvetica;writing-mode:lr-tb;fill:#4d4d4d;fill-opacity:1;fill-rule:nonzero;stroke:none"
-           id="text13941"
-           x="34.69249"
-           y="-95.379997"><tspan
-             x="34.69249 39.696491 44.700489"
-             y="-95.379997"
-             sodipodi:role="line"
-             id="tspan13939">100</tspan></text>
+         transform="matrix(0.84799101,0,0,0.84799101,-59.909525,44.559595)">
         <text
            transform="scale(1,-1)"
            style="font-variant:normal;font-weight:normal;font-size:9px;font-family:Helvetica;-inkscape-font-specification:Helvetica;writing-mode:lr-tb;fill:#4d4d4d;fill-opacity:1;fill-rule:nonzero;stroke:none"
@@ -9892,7 +9920,7 @@
          id="g14023" />
       <g
          id="g14025"
-         transform="matrix(0.83507563,0,0,0.83507563,43.064889,-23.613534)">
+         transform="matrix(0.83507563,0,0,0.83507563,-5.5547958,45.520974)">
         <text
            transform="matrix(1,0,0,-1,343.18,83.07)"
            style="font-variant:normal;font-weight:normal;font-size:14.37px;font-family:Helvetica;-inkscape-font-specification:Helvetica;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
@@ -9905,7 +9933,7 @@
       </g>
       <g
          id="g14025-6"
-         transform="matrix(0,0.83507563,-0.83507563,0,136.36677,-80.735484)">
+         transform="matrix(0,0.83507563,-0.83507563,0,134.24708,-43.100976)">
         <text
            transform="matrix(1,0,0,-1,343.18,83.07)"
            style="font-variant:normal;font-weight:normal;font-size:14.37px;font-family:Helvetica;-inkscape-font-specification:Helvetica;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
@@ -9949,7 +9977,7 @@
       <g
          id="g16696"
          inkscape:label="map2"
-         transform="matrix(0.39838359,0,0,0.39838359,391.43555,54.637669)">
+         transform="matrix(0.39838359,0,0,0.39838359,279.81586,122.27218)">
         <g
            id="g16698" />
         <g
@@ -11498,25 +11526,105 @@
          id="rect18275"
          width="222.00725"
          height="168.54414"
-         x="414.37048"
-         y="-235.70302"
+         x="302.75079"
+         y="-303.33755"
          transform="scale(1,-1)" />
       <rect
-         style="opacity:0.95;fill:none;stroke:#000000;stroke-width:1.45992;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         style="opacity:0.95;fill:none;stroke:#000000;stroke-width:1.17242;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
          id="rect18275-5"
-         width="549.06494"
-         height="364.00244"
-         x="89.19297"
-         y="-429.66708"
+         width="440.83929"
+         height="292.38556"
+         x="85.871925"
+         y="-426.87457"
          transform="scale(1,-1)" />
       <path
-         style="fill:none;stroke:#000000;stroke-width:0.552756;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-         d="m 311.56853,215.09279 c 102.80196,22.11023 102.80196,22.11023 102.80196,22.11023"
+         style="fill:none;stroke:#000000;stroke-width:0.947218;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="M 199.94884,212.2273 C 302.7508,277.15438 302.7508,277.15438 302.7508,277.15438"
          id="path25695" />
       <path
-         style="fill:none;stroke:#000000;stroke-width:0.574606;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-         d="M 311.56853,209.02965 414.37049,68.658864"
+         style="fill:none;stroke:#000000;stroke-width:0.409724;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="M 199.94884,206.16416 302.75079,134.7934"
          id="path25810" />
+      <text
+         xml:space="preserve"
+         style="font-size:12px;line-height:1.25;font-family:Arial;-inkscape-font-specification:Arial;word-spacing:0px;stroke-width:0.75"
+         x="398.58807"
+         y="-239.36371"
+         id="text4689"
+         transform="scale(1,-1)"><tspan
+           sodipodi:role="line"
+           id="tspan4687"
+           style="font-size:12px;stroke-width:0.75"
+           x="398.58807"
+           y="-239.36371">Xiaoliuqiu</tspan></text>
+      <text
+         xml:space="preserve"
+         style="font-size:12px;line-height:1.25;font-family:Arial;-inkscape-font-specification:Arial;word-spacing:0px;stroke-width:0.75"
+         x="115.34277"
+         y="-304.19629"
+         id="text4689-2"
+         transform="scale(1,-1)"><tspan
+           sodipodi:role="line"
+           id="tspan4687-8"
+           style="font-style:italic;font-size:12px;stroke-width:0.75"
+           x="115.34277"
+           y="-304.19629">China</tspan></text>
+      <text
+         xml:space="preserve"
+         style="font-size:12px;line-height:1.25;font-family:Arial;-inkscape-font-specification:Arial;word-spacing:0px;stroke-width:0.75"
+         x="123.47482"
+         y="-139.89714"
+         id="text4689-2-8"
+         transform="scale(1,-1)"><tspan
+           sodipodi:role="line"
+           id="tspan4687-8-8"
+           style="font-style:italic;font-size:12px;stroke-width:0.75"
+           x="123.47482"
+           y="-139.89714">Philippines</tspan></text>
+      <text
+         xml:space="preserve"
+         style="font-size:12px;line-height:1.25;font-family:Arial;-inkscape-font-specification:Arial;word-spacing:0px;stroke-width:0.75"
+         x="210.93073"
+         y="-259.14316"
+         id="text4689-7"
+         transform="scale(1,-1)"><tspan
+           sodipodi:role="line"
+           id="tspan4687-5"
+           style="font-style:italic;font-size:12px;stroke-width:0.75"
+           x="210.93073"
+           y="-259.14316">Taiwan</tspan></text>
+      <text
+         xml:space="preserve"
+         style="font-size:12px;line-height:1.25;font-family:Arial;-inkscape-font-specification:Arial;word-spacing:0px;stroke-width:0.75"
+         x="379.59174"
+         y="-374.87909"
+         id="text4689-7-7"
+         transform="scale(1,-1)"><tspan
+           sodipodi:role="line"
+           id="tspan4687-5-2"
+           style="font-style:italic;font-size:12px;stroke-width:0.75"
+           x="379.59174"
+           y="-374.87909">Japan</tspan></text>
+      <text
+         xml:space="preserve"
+         style="font-size:11px;line-height:1.25;font-family:Arial;-inkscape-font-specification:Arial;word-spacing:0px;stroke-width:0.75"
+         x="270.17966"
+         y="-378.9339"
+         id="text4689-7-7-3"
+         transform="scale(1,-1)"><tspan
+           sodipodi:role="line"
+           id="tspan4687-5-2-8"
+           style="font-style:italic;font-size:11px;stroke-width:0.75"
+           x="270.17966"
+           y="-378.9339">Korea</tspan></text>
+      <path
+         style="fill:none;stroke:#000000;stroke-width:0.62927;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:5.2;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Arrow2Lend)"
+         d="m 209.74314,239.36975 10.16941,17.20546"
+         id="path6969" />
+      <path
+         style="fill:none;stroke:#000000;stroke-width:0.767302;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:5.2;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Arrow2Lend-3)"
+         d="m 204.85811,158.27754 -18.4165,-14.12585"
+         id="path6969-7" />
     </g>
   </g>
 </svg>

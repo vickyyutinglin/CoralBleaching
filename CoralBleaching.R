@@ -6,6 +6,8 @@ library(dplyr)
 #library(colorspace)    
 #library(RColorBrewer)    
 library(fmsb)
+library(ncdf4)
+library(scales)
 
 ### directory & data importation
 setwd('C:/Users/Vicky/Dropbox/FRE - Vicky@DP/Publication/On the way to publish/12. XLQ mesophotic bleacing event/Data')
@@ -18,15 +20,8 @@ maj.per <- (maj[,-1]/colSums(maj[,-1]))*100
 rownames(maj.per) <- maj$Major_cate
 maj.per
 
-mean(as.numeric(maj.per[4,1:3])) # mean coral cover in 2022
-sd(as.numeric(maj.per[4,1:3])) # sd coral cover in 2022
-mean(as.numeric(maj.per[4,4:6])) # mean coral cover in 2023
-sd(as.numeric(maj.per[4,4:6])) # sd coral cover in 2023
 
-mean(as.numeric(maj.per[8,1:3]))
-sd(as.numeric(maj.per[8,1:3]))
-mean(as.numeric(maj.per[8,4:6]))
-sd(as.numeric(maj.per[8,4:6]))
+
 # Hard coral cover did not change bwtween 2022 & 2023
 #maj.per.2022HC <- as.numeric(maj.per[4,c(1,2,3)])
 #maj.per.2023HC <- as.numeric(maj.per[4,c(4,5,6)])
@@ -46,9 +41,97 @@ sd(as.numeric(maj.per[8,4:6]))
 # stacked + percent
 maj_long <- gather(maj, transect, cover, X2022_T1, X2022_T2, X2022_T3, X2023_T1, X2023_T2, X2023_T3, factor_key=TRUE)
 maj_long
+maj.col <- c('#66c2a5','#b3b3b3','#e78ac3','#8da0cb','#fc8d62','#e5c494','#ffd92f','#a6d854')
 ggplot(maj_long, aes(fill=Major_cate, y=cover, x=transect)) + 
   geom_bar(position="fill", stat="identity") +
-  scale_fill_manual(values = c("green", "grey", "pink",'blue','black','lightblue','yellow','lightgreen'))
+  scale_fill_manual(values = maj.col)
+
+# stacked + percent + bleaching
+maj.ble <- benthic_data[,-c(2,10)]
+maj.ble$maj.ble <- with(maj.ble, paste(Major_cate, Bleached_status, sep = "_"))
+maj.ble$Major_cate <- NULL
+maj.ble$Bleached_status <- NULL
+maj.ble <- aggregate(maj.ble[,-7], list(as.character(maj.ble$maj.ble)), sum)
+colnames(maj.ble) <- c('Major_Category_Bleached','X2022_T1', 'X2022_T2', 'X2022_T3', 'X2023_T1', 'X2023_T2', 'X2023_T3')
+
+maj.ble.long <- gather(maj.ble, Transect, Absolute_cover, X2022_T1, X2022_T2, X2022_T3, X2023_T1, X2023_T2, X2023_T3, factor_key=TRUE)
+
+maj.ble.seq <- c("Algae_",                                  
+                 "Bare_substrate_",   
+                 "CCA_Dead_CCA",  
+                 "CCA_",                                    
+                 "Hard_corals_Bleached",                    
+                 "Hard_corals_Partly_Bleached",   
+                 "Hard_corals_Health",
+                 "Other_live_",                             
+                 "Soft_corals_Bleached",                    
+                 "Soft_corals_Partly_Bleached" ,   
+                 "Soft_corals_Health",
+                 "Sponges_Dead_Terpios"  ,      
+                 "Sponges_" ,
+                 "Turf_cyanobacteria_Dead_Endolithic_Algae",
+                 "Turf_cyanobacteria_Dead_Turf" ,
+                 "Turf_cyanobacteria_" )
+Tran.seq <- factor(maj.ble.long$Transect , levels = c('X2023_T3', 'X2023_T2','X2023_T1','X2022_T3','X2022_T2','X2022_T1'))
+Major_Category <- factor(maj.ble.long$Major_Category_Bleached, levels = maj.ble.seq)
+
+
+maj.ble.col <- c('#66c2a5','#b3b3b3',"#E78AC399",'#e78ac3',"#8DA0CB66","#8DA0CBB3",'#8da0cb',
+                 '#fc8d62',"#E5C49499","#E5C494CC",'#e5c494',"#FFD92FB3",'#ffd92f',"#A6D85466","#A6D854B3",'#a6d854')
+
+
+adjustcolor('#8da0cb', alpha.f = 0.4) 
+
+ggplot(maj.ble.long, aes(fill = Major_Category, y = Absolute_cover, x = Tran.seq)) + 
+  geom_bar(position="fill", stat="identity") +
+  scale_fill_manual(values = maj.ble.col) + 
+  coord_flip() + 
+  theme_classic()
+
+
+
+
+
+# bar plot comparing 2022 and 2023
+maj.per.yr <- as.data.frame(t(maj.per))
+maj.per.yr$year <- c(rep('2022',3),rep('2023',3))
+
+maj.per.yr.mean <- maj.per.yr %>%
+  group_by(year) %>%
+  summarise(Algae = mean(Algae),
+            Bare.substrate = mean(Bare_substrate),
+            CCA = mean(CCA),
+            Hard.corals = mean(Hard_corals),
+            Other.life = mean(Other_live),
+            Soft.corals = mean(Soft_corals),
+            Sponges = mean(Sponges),
+            Turf = mean(Turf_cyanobacteria))
+
+maj.per.yr.mean <- gather(maj.per.yr.mean, maj, value = 'cover', 2:9)
+
+maj.per.yr.sd <- maj.per.yr %>%
+  group_by(year) %>%
+  summarise(Algae = sd(Algae),
+            Bare.substrate = sd(Bare_substrate),
+            CCA = sd(CCA),
+            Hard.corals = sd(Hard_corals),
+            Other.life = sd(Other_live),
+            Soft.corals = sd(Soft_corals),
+            Sponges = sd(Sponges),
+            Turf = sd(Turf_cyanobacteria))
+maj.per.yr.sd <- gather(maj.per.yr.sd, maj, value = 'cover', 2:9)
+
+
+maj.per.yr.bar <- cbind(maj.per.yr.mean, maj.per.yr.sd$cover)
+colnames(maj.per.yr.bar) <- c('Year', 'Major', 'Cover', 'SD')
+maj.per.yr.bar
+
+ggplot(maj.per.yr.bar, aes(x = Year, y = Cover, fill = Major)) +
+  geom_bar(stat = "identity") +
+  geom_errorbar(aes(ymin = Cover-SD, ymax = Cover+SD), position =  "dodge", width = 0.2) +
+  facet_wrap(~Major, scales = "free")+
+  scale_fill_manual(values = maj.col)
+
 
 
 ### labels
@@ -131,16 +214,37 @@ mean(Ana[1:3])
 sd(Ana[1:3])
 mean(Ana[4:6])
 sd(Ana[4:6])
+
 # stacked + percent
-Coral_long <- gather(Coral, transect, cover, X2022_T1, X2022_T2, X2022_T3, X2023_T1, X2023_T2, X2023_T3, factor_key=TRUE)
-Coral_long
-ggplot(Coral_long, aes(fill=Label, y=cover, x=transect)) + 
+Coral_long <- gather(Coral, Transect, Relative_cover, X2022_T1, X2022_T2, X2022_T3, X2023_T1, X2023_T2, X2023_T3, factor_key=TRUE)
+Coral_long.seq <- c("Acropora_tenella_branching",          
+                    "Anacropora_forbesi_branching",        
+                    "Anacropora_matthaii&pillai_branching",
+                    "Stylophora_pistillata_branching",
+                    "Poccilopora_spp_bushy",
+                    "Astreopora_spp_massive",              
+                    "Cyphastrea_spp_massive",              
+                    "Goniopora_spp_massive",               
+                    "Lobophyllia_hemprichii_massive",  
+                    "Montipora_spp_massive",
+                    "Favites_spp_ecrusting",
+                    "Lobophyllia_spp_encrusting",          
+                    "Montipora_spp_encrusting",  
+                    "stony_coral_encrusting",
+                    "Litophyton_spp_bushy",
+                    "Sarcophyton_spp_massive")    
+Coral.seq <- factor(Coral_long$Label, levels = Coral_long.seq)
+Tran.seq <- factor(Coral_long$Transect , levels = c('X2023_T3', 'X2023_T2','X2023_T1','X2022_T3','X2022_T2','X2022_T1'))
+coral.col <- c('#3288bd',"#3288BDCC","#3288BD99","#3288BD66",'#99d594',
+               '#fee08b',"#FEE08BCC","#FEE08B99","#FEE08B66","#FEE08B33", 
+               '#fc8d59',"#FC8D59CC","#FC8D5999","#FC8D5966",'#d53e4f','#9e0142')
+
+ggplot(Coral_long, aes(fill = Coral.seq, y = Relative_cover, x = Tran.seq)) + 
   geom_bar(position="fill", stat="identity") +
-  scale_fill_manual(values = c("#1F78B4","#A6CEE3","#80B1D3",
-                               "#B15928", "#FF7F00","#E31A1C", "#FDBF6F", 
-                               "#6A3D9A","#BC80BD","#CAB2D6",
-                               "#FFED6F", "#FB9A99","#33A02C","#5d0e66",
-                               "#8DD3C7","#d1a66d"))
+  scale_fill_manual(values = coral.col) +
+  coord_flip() + 
+  theme_classic()
+
 
 
 ### bleaching conditions
@@ -150,9 +254,90 @@ bleaching <- t(bleaching)
 bleaching <- bleaching[,-1]
 colnames(bleaching) <- bleaching[1,]
 
+pre.bleaching <- as.data.frame(matrix(as.numeric(bleaching[-1,]), ncol = 7, nrow = 6)[c(1:3),])
+colnames(pre.bleaching) <- colnames(bleaching)
+pre.bleaching.per <- 100*(pre.bleaching/rowSums(pre.bleaching))
+
+pre.bleaching.mean <- pre.bleaching.per %>%
+  summarise(Bleached = mean(Bleached),
+            Dead_CCA = mean(Dead_CCA),
+            Dead_Endolithic_Algae = mean(Dead_Endolithic_Algae),
+            Dead_Terpios = mean(Dead_Terpios),
+            Dead_Turf = mean(Dead_Turf),
+            Health = mean(Health),
+            Partly_Bleached = mean(Partly_Bleached))
+
+pre.bleaching.sd <- pre.bleaching.per %>%
+  summarise(Bleached = sd(Bleached),
+            Dead_CCA = sd(Dead_CCA),
+            Dead_Endolithic_Algae = sd(Dead_Endolithic_Algae),
+            Dead_Terpios = sd(Dead_Terpios),
+            Dead_Turf = sd(Dead_Turf),
+            Health = sd(Health),
+            Partly_Bleached = sd(Partly_Bleached))
+
+var <- colnames(pre.bleaching.per)
+pre.mean <- t(pre.bleaching.mean)
+pre.upper <- t(pre.bleaching.mean) + t(pre.bleaching.sd) 
+pre.lower <- t(pre.bleaching.mean) - t(pre.bleaching.sd)
+pre.bleaching.rad <- data.frame(var, pre.mean, pre.upper, pre.lower)
+
+
+
+
+post.bleaching <- as.data.frame(matrix(as.numeric(bleaching[-1,]), ncol = 7, nrow = 6)[c(4:6),])
+colnames(post.bleaching) <- colnames(bleaching)
+post.bleaching.per <- 100*(post.bleaching/rowSums(post.bleaching))
+
+post.bleaching.mean <- post.bleaching.per %>%
+  summarise(Bleached = mean(Bleached),
+            Dead_CCA = mean(Dead_CCA),
+            Dead_Endolithic_Algae = mean(Dead_Endolithic_Algae),
+            Dead_Terpios = mean(Dead_Terpios),
+            Dead_Turf = mean(Dead_Turf),
+            Health = mean(Health),
+            Partly_Bleached = mean(Partly_Bleached))
+
+post.bleaching.sd <- post.bleaching.per %>%
+  summarise(Bleached = sd(Bleached),
+            Dead_CCA = sd(Dead_CCA),
+            Dead_Endolithic_Algae = sd(Dead_Endolithic_Algae),
+            Dead_Terpios = sd(Dead_Terpios),
+            Dead_Turf = sd(Dead_Turf),
+            Health = sd(Health),
+            Partly_Bleached = sd(Partly_Bleached))
+
+
+post.mean <- t(post.bleaching.mean)
+post.upper <- t(post.bleaching.mean) + t(post.bleaching.sd) 
+post.lower <- t(post.bleaching.mean) - t(post.bleaching.sd)
+bleaching.rad <- data.frame(var, pre.mean, pre.upper, pre.lower,
+                                 post.mean, post.upper, post.lower)
+
+
+
+ggplot(bleaching.rad, aes(x = var, y = pre.mean, group = 1)) +
+  geom_polygon(fill = NA, colour = '#fbb4ae') +
+  geom_polygon(aes(y = pre.upper), fill = adjustcolor('#fbb4ae', alpha.f = 0.5)) +
+  geom_polygon(aes(y = pre.lower), fill = 'white') +
+ 
+  geom_polygon(aes(x = var, y = post.mean, group = 1), fill = NA, colour = '#8dd3c7') +
+  geom_polygon(aes(y = post.upper), fill = adjustcolor( '#8dd3c7', alpha.f = 0.5)) +
+  geom_polygon(aes(y = post.lower), fill = 'white') +
+  
+  theme_light() +
+  theme() + 
+  coord_polar() +
+  labs(x = "", y = "")
+
+
+# radar plot
 pre.bleaching <- matrix(as.numeric(bleaching[-1,]), ncol = 7, nrow = 6)[c(1:3),]
 colnames(pre.bleaching) <- colnames(bleaching)
 pre.bleaching.per <- 100*(colSums(pre.bleaching)/sum(pre.bleaching))
+
+bleaching.per.radar <- as.data.frame(rbind(rep(60,7), rep(0,7), pre.bleaching.per, post.bleaching.per))
+
 
 post.bleaching <- matrix(as.numeric(bleaching[-1,]), ncol = 7, nrow = 6)[c(4:6),]
 colnames(post.bleaching) <- colnames(bleaching)
@@ -161,8 +346,9 @@ post.bleaching.per <- 100*(colSums(post.bleaching)/sum(post.bleaching))
 bleaching.per.radar <- as.data.frame(rbind(rep(60,7), rep(0,7), pre.bleaching.per, post.bleaching.per))
 
 # Color vector
-colors_border=c( rgb(1,0.4,0.6,0.9), rgb(0.2,0.8,0.8,0.9) )
-colors_in=c( rgb(1,0.4,0.6,0.4), rgb(0.2,0.8,0.8,0.4) )
+colors_border=c('#8dd3c7','#fbb4ae')
+colors_in=c("#8DD3C7B3", "#FBB4AEB3")
+adjustcolor('#fbb4ae', alpha.f = 0.7)
 
 # plot with default options:
 radarchart( bleaching.per.radar  , axistype=1 , 
@@ -205,6 +391,76 @@ legend(x=1.2, y=1.2, legend = c('2022 summer','2023 summer'), bty = "n", pch=20 
 
 
 
+AT.pre.bleaching <- matrix(as.numeric(AT.coral), ncol = 7, nrow = 6)[c(1:3),]
+colnames(AT.pre.bleaching) <- colnames(AT.coral)
+AT.pre.bleaching.per <- as.data.frame(100*(AT.pre.bleaching/rowSums(AT.pre.bleaching)))
+
+AT.pre.bleaching.per.mean <- AT.pre.bleaching.per %>%
+  summarise(Bleached = mean(Bleached),
+            Dead_CCA = mean(Dead_CCA),
+            Dead_Endolithic_Algae = mean(Dead_Endolithic_Algae),
+            Dead_Terpios = mean(Dead_Terpios),
+            Dead_Turf = mean(Dead_Turf),
+            Health = mean(Health),
+            Partly_Bleached = mean(Partly_Bleached))
+
+AT.pre.bleaching.per.sd <- AT.pre.bleaching.per %>%
+  summarise(Bleached = sd(Bleached),
+            Dead_CCA = sd(Dead_CCA),
+            Dead_Endolithic_Algae = sd(Dead_Endolithic_Algae),
+            Dead_Terpios = sd(Dead_Terpios),
+            Dead_Turf = sd(Dead_Turf),
+            Health = sd(Health),
+            Partly_Bleached = sd(Partly_Bleached))
+AT.pre.mean <- t(AT.pre.bleaching.per.mean)
+AT.pre.upper <- t(AT.pre.bleaching.per.mean) + t(AT.pre.bleaching.per.sd) 
+AT.pre.lower <- t(AT.pre.bleaching.per.mean) - t(AT.pre.bleaching.per.sd)
+
+AT.post.bleaching <- matrix(as.numeric(AT.coral), ncol = 7, nrow = 6)[c(4:6),]
+colnames(AT.post.bleaching) <- colnames(AT.coral)
+AT.post.bleaching.per <- as.data.frame(100*(AT.post.bleaching/rowSums(AT.post.bleaching)))
+AT.post.bleaching.mean <- AT.post.bleaching.per %>%
+  summarise(Bleached = mean(Bleached),
+            Dead_CCA = mean(Dead_CCA),
+            Dead_Endolithic_Algae = mean(Dead_Endolithic_Algae),
+            Dead_Terpios = mean(Dead_Terpios),
+            Dead_Turf = mean(Dead_Turf),
+            Health = mean(Health),
+            Partly_Bleached = mean(Partly_Bleached))
+
+AT.post.bleaching.sd <- AT.post.bleaching.per %>%
+  summarise(Bleached = sd(Bleached),
+            Dead_CCA = sd(Dead_CCA),
+            Dead_Endolithic_Algae = sd(Dead_Endolithic_Algae),
+            Dead_Terpios = sd(Dead_Terpios),
+            Dead_Turf = sd(Dead_Turf),
+            Health = sd(Health),
+            Partly_Bleached = sd(Partly_Bleached))
+
+
+AT.post.mean <- t(AT.post.bleaching.mean)
+AT.post.upper <- t(AT.post.bleaching.mean) + t(AT.post.bleaching.sd) 
+AT.post.lower <- t(AT.post.bleaching.mean) - t(AT.post.bleaching.sd)
+AT.bleaching.rad <- data.frame(var,AT.pre.mean, AT.pre.upper, AT.pre.lower,
+                               AT.post.mean, AT.post.upper, AT.post.lower)
+
+ggplot(AT.bleaching.rad, aes(x = var, y = AT.pre.mean, group = 1)) +
+  geom_polygon(fill = NA, colour = '#fbb4ae') +
+  geom_polygon(aes(y = AT.pre.upper), fill = adjustcolor('#fbb4ae', alpha.f = 0.5)) +
+  geom_polygon(aes(y = AT.pre.lower), fill = 'white') +
+  
+  geom_polygon(aes(x = var, y = AT.post.mean, group = 1), fill = NA, colour = '#8dd3c7') +
+  geom_polygon(aes(y = AT.post.upper), fill = adjustcolor('#8dd3c7', alpha.f = 0.5)) +
+  geom_polygon(aes(y = AT.post.lower), fill = 'white') +
+  
+  theme_light() +
+  theme() + 
+  coord_polar() +
+  labs(x = "", y = "")
+
+
+
+AT.bleaching.per.radar <- as.data.frame(rbind(rep(60,7), rep(0,7), AT.pre.bleaching.per, AT.post.bleaching.per))
 
 ### map
 library(sp)
@@ -248,6 +504,9 @@ ggplot(data = TW.df.sf) +
                          pad_x = unit(0.75, "in"), pad_y = unit(0.1, "in"),
                          style = north_arrow_fancy_orienteering) +
   theme(panel.background = element_rect(fill = 'aliceblue')) 
+
+
+
 
 
 ##### SST
@@ -350,9 +609,9 @@ DHW.df$Alert
 sst.poi <- sst_array[8,15,]
 DHW.poi <- DHW_array[8,15,]
 BAA.poi <- BAA_array[8,15,]
-#sst.df <- data.frame(date, sst.poi)
-#DHW.df <- data.frame(date, DHW.poi)
-#BAA.df <-  data.frame(date, BAA.poi)
+sst.df <- data.frame(date, sst.poi)
+DHW.df <- data.frame(date, DHW.poi)
+BAA.df <-  data.frame(date, BAA.poi)
 date <- as.Date(date, format = "%y-%m-%d")
 df <- data.frame(date, sst.poi, DHW.poi, BAA.poi)
 
@@ -392,9 +651,59 @@ ggplot(data = df)+
   geom_area(data = filter(df, BAA.poi == 2& date > '2022-12-30'), aes(x = date, y = DHW.poi*2), fill = "orange", alpha = 0.8) +
   geom_area(data = filter(df, BAA.poi == 3& date > '2022-12-30'), aes(x = date, y = DHW.poi*2), fill = "red", alpha = 0.8) +
   geom_area(data = filter(df, BAA.poi == 4& date > '2022-12-30'), aes(x = date, y = DHW.poi*2), fill = "darkred", alpha = 0.8) +
-
-  scale_y_continuous(name = "Temperature (°C)",  
-                     sec.axis = sec_axis(~.*0.5, name="DHW (°C-weeks)"))+
+  
+  scale_y_continuous(name = "Temperature (°C)",
+                     sec.axis = sec_axis(~./2, name="DHW (°C-weeks)"))+
   scale_x_date(breaks = date_breaks("1 month"), date_labels="%b")+
+  #coord_cartesian( ylim = c(15, 30))+
   theme_bw()
 
+ggplot(data = df)+
+  xlab('Date')+
+  geom_line( aes(x = date, y = sst.poi), color = "black", size = 2)+
+  geom_hline(yintercept = 14, color = "red", linetype="dotted", size = 1)+
+  geom_hline(yintercept = 22, color = "red", linetype="dotted", size = 1)+
+  #geom_hline(yintercept = 0, color = "black", size = 1)+ 
+  geom_area(data = filter(df, BAA.poi == 0& date > '2022-09-25' & date < '2023-01-01'), aes(x = date, y = DHW.poi*2+6), fill = "gray", alpha = 0.8) +
+  geom_area(data = filter(df, BAA.poi == 0& date > '2023-09-01'), aes(x = date, y = DHW.poi*2+6), fill = "gray", alpha = 0.8) +
+  
+  geom_area(data = filter(df, BAA.poi == 1& date < '2022-12-30'& date > '2022-08-01'), aes(x = date, y = DHW.poi*2+6), fill = "yellow", alpha = 0.8) +
+  geom_area(data = filter(df, BAA.poi == 2& date < '2022-12-30'), aes(x = date, y = DHW.poi*2+6), fill = "orange", alpha = 0.8) +
+  geom_area(data = filter(df, BAA.poi == 3& date < '2022-12-30'), aes(x = date, y = DHW.poi*2+6), fill = "red", alpha = 0.8) +
+  geom_area(data = filter(df, BAA.poi == 4& date < '2022-12-30'), aes(x = date, y = DHW.poi*2+6), fill = "darkred", alpha = 0.8) +
+  
+  geom_area(data = filter(df, BAA.poi == 1& date > '2022-12-30'), aes(x = date, y = DHW.poi*2+6), fill = "yellow", alpha = 0.8) +
+  geom_area(data = filter(df, BAA.poi == 2& date > '2022-12-30'), aes(x = date, y = DHW.poi*2+6), fill = "orange", alpha = 0.8) +
+  geom_area(data = filter(df, BAA.poi == 3& date > '2022-12-30'), aes(x = date, y = DHW.poi*2+6), fill = "red", alpha = 0.8) +
+  geom_area(data = filter(df, BAA.poi == 4& date > '2022-12-30'), aes(x = date, y = DHW.poi*2+6), fill = "darkred", alpha = 0.8) +
+
+  scale_y_continuous(name = "Temperature (°C)",
+                     sec.axis = sec_axis(~(.-6)/2, name="DHW (°C-weeks)"))+
+  scale_x_date(breaks = date_breaks("1 month"), date_labels="%b")+
+  coord_cartesian( ylim = c(14, 32))+
+  theme_bw()
+
+ggplot(data = df)+
+  xlab('Date')+
+
+  geom_hline(yintercept = 8, color = "red", linetype="dotted", size = 1)+
+  geom_hline(yintercept = 16, color = "red", linetype="dotted", size = 1)+
+  #geom_hline(yintercept = 0, color = "black", size = 1)+ 
+  geom_area(data = filter(df, BAA.poi == 0& date > '2022-09-25' & date < '2023-01-01'), aes(x = date, y = DHW.poi*2), fill = "gray", alpha = 0.8) +
+  geom_area(data = filter(df, BAA.poi == 0& date > '2023-09-01'), aes(x = date, y = DHW.poi*2), fill = "gray", alpha = 0.8) +
+  
+  geom_area(data = filter(df, BAA.poi == 1& date < '2022-12-30'& date > '2022-08-01'), aes(x = date, y = DHW.poi*2), fill = "yellow", alpha = 0.8) +
+  geom_area(data = filter(df, BAA.poi == 2& date < '2022-12-30'), aes(x = date, y = DHW.poi*2), fill = "orange", alpha = 0.8) +
+  geom_area(data = filter(df, BAA.poi == 3& date < '2022-12-30'), aes(x = date, y = DHW.poi*2), fill = "red", alpha = 0.8) +
+  geom_area(data = filter(df, BAA.poi == 4& date < '2022-12-30'), aes(x = date, y = DHW.poi*2), fill = "darkred", alpha = 0.8) +
+  
+  geom_area(data = filter(df, BAA.poi == 1& date > '2022-12-30'), aes(x = date, y = DHW.poi*2), fill = "yellow", alpha = 0.8) +
+  geom_area(data = filter(df, BAA.poi == 2& date > '2022-12-30'), aes(x = date, y = DHW.poi*2), fill = "orange", alpha = 0.8) +
+  geom_area(data = filter(df, BAA.poi == 3& date > '2022-12-30'), aes(x = date, y = DHW.poi*2), fill = "red", alpha = 0.8) +
+  geom_area(data = filter(df, BAA.poi == 4& date > '2022-12-30'), aes(x = date, y = DHW.poi*2), fill = "darkred", alpha = 0.8) +
+  
+  scale_y_continuous(name = "Temperature (°C)", breaks=c(5, 10, 15, 20, 25, 30), labels=c(11, 16 ,21, 26, 31, 36), 
+                     sec.axis = sec_axis(~./2, name="DHW (°C-weeks)"), expand = c(0,0))+
+  scale_x_date(breaks = date_breaks("1 month"), date_labels="%b")+
+  geom_line( aes(x = date, y = sst.poi-6), color = "black", size = 2)+
+  theme_bw()
