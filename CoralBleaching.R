@@ -8,7 +8,16 @@ library(dplyr)
 library(fmsb)
 library(ncdf4)
 library(scales)
-
+library(sp)
+library(maps)
+library(maptools)
+library(ggthemes)
+library(rgdal)
+library(ggspatial)
+library(rnaturalearth)
+library(rnaturalearthdata)
+library(sf)
+library(grid)
 ### directory & data importation
 setwd('C:/Users/Vicky/Dropbox/FRE - Vicky@DP/Publication/On the way to publish/12. XLQ mesophotic bleacing event/Data')
 benthic_data <- read.csv('benthic_data.csv', sep = ',', header = T)
@@ -94,6 +103,12 @@ Major_Category_Bleached <- maj.ble$Major_Category_Bleached
 maj.ble.yr <- data.frame(Major_Category_Bleached, maj.ble.2022, maj.ble.2023)
 colnames(maj.ble.yr) <- c('Major_Category_Bleached','X2022','X2023')
 
+maj.ble.2022 <- 100*(maj.ble.yr[,2]/colSums(maj.ble.yr[,2:3]))
+maj.ble.2023 <- 100*(maj.ble.yr[,3]/colSums(maj.ble.yr[,2:3]))
+maj.ble.2223 <- data.frame(maj.ble.yr$Major_Category_Bleached, maj.ble.2022, maj.ble.2023)
+sum(maj.ble.2223[5:7,2])
+sum(maj.ble.2223[5:7,3])
+
 maj.ble.yr.long <- gather(maj.ble.yr, Year, Absolute_cover, X2022, X2023, factor_key=TRUE)
 Major_Category <- factor(maj.ble.yr.long$Major_Category_Bleached, levels = maj.ble.seq)
 Year. <- factor(maj.ble.yr.long$Year , levels = c('X2023','X2022'))
@@ -109,7 +124,7 @@ ggplot(maj.ble.yr.long, aes(fill = Major_Category, y = Absolute_cover, x = Year.
 maj.per.yr <- as.data.frame(t(maj.per))
 maj.per.yr$year <- c(rep('2022',3),rep('2023',3))
 
-maj.per.yr.mean <- maj.per.yr %>%
+maj.per.yr.mean1 <- maj.per.yr %>%
   group_by(year) %>%
   summarise(Algae = mean(Algae),
             Bare.substrate = mean(Bare_substrate),
@@ -119,8 +134,8 @@ maj.per.yr.mean <- maj.per.yr %>%
             Soft.corals = mean(Soft_corals),
             Sponges = mean(Sponges),
             Turf = mean(Turf_cyanobacteria))
-
-maj.per.yr.mean <- gather(maj.per.yr.mean, maj, value = 'cover', 2:9)
+maj.per.yr.mean1[2,-1]-maj.per.yr.mean1[1,-1]
+maj.per.yr.mean <- gather(maj.per.yr.mean1, maj, value = 'cover', 2:9)
 
 maj.per.yr.sd <- maj.per.yr %>%
   group_by(year) %>%
@@ -156,18 +171,20 @@ benthic.data.label$Group.1 <- NULL
 benthic.data.label <- t(benthic.data.label)
 colnames(benthic.data.label) <- Label
 
+# PERMANOVA does not work: too few samples
 #Year <- as.factor(c('2022','2022','2022','2023','2023','2023'))
 #benthic.data.label.tr <- sqrt(benthic.data.label)
 #benthic.data.label.bray <-vegdist(benthic.data.label.tr, method='bray')
-#Permanove.benthic.label <-adonis2(benthic.data.label.bray ~ Year, data = as.data.frame(benthic.data.label), permutations = 999, method="bray")
+#Permanove.benthic.label <-adonis2(benthic.data.label.bray ~ Year, data = as.data.frame(benthic.data.label.tr), permutations = 99, method="bray", strata = Year)
 #Permanove.benthic.label
 
-benthic.data.label.per <- (benthic.data.label/rowSums(benthic.data.label)[1])*100
+benthic.data.label.per <- as.data.frame((benthic.data.label/rowSums(benthic.data.label)[1])*100)
 benthic.data.label.per.nmds <- benthic.data.label.per %>% 
   select_if(~any(. >=5)) # select the species with >5% to show in nmds
 
 
 # nmds
+set.seed(1)
 nmds.benthic <- metaMDS(benthic.data.label, distance = "bray")   
 nmds.benthic$stress
 stressplot(nmds.benthic)
@@ -199,8 +216,11 @@ ggplot() +
   theme(legend.position = "right",text = element_text(size = 24)) +
   scale_x_continuous(name="nMDS 1") +
   scale_y_continuous(name="nMDS 2") 
-   
-  
+
+
+benthic.data.label$year <- c('2022','2022','2022','2023','2023','2023')   
+benthic.data.label.dist <- benthic.data.label
+adonis2(benthic.data.label ~ benthic.data.label$year, data = benthic.data.label, permutations = 999, method = "bray", strata = year)
 
 ### coral assemblage
 HC <- benthic_data %>% filter(Major_cate=='Hard_corals')
@@ -210,7 +230,7 @@ Coral$Major_cate <- NULL
 Coral$Bleached_status <- NULL
 Coral$Label_raw <- NULL
 
-Coral.per <- aggregate(Coral[,-1], list(Coral$Label), sum)
+Coral.per <- aggregate(Coral[,-1], unique(list(Coral$Label)), sum)
 rownames(Coral.per) <- Coral.per$Group.1
 Coral.per[,1]<-NULL
 Coral.per <- apply(Coral.per,2,function(x) {100*(x/sum(x))})
@@ -227,6 +247,55 @@ mean(Ana[1:3])
 sd(Ana[1:3])
 mean(Ana[4:6])
 sd(Ana[4:6])
+
+
+
+Coral.yr.cover <- as.data.frame(t(Coral.per))
+Coral.yr.cover$year <- c(rep('2022',3),rep('2023',3))
+
+Coral.yr.cover.mean1 <- Coral.yr.cover %>%
+  group_by(year) %>%
+  summarise(Acropora_tenella_branching = mean(Acropora_tenella_branching),
+            Anacropora_forbesi_branching = mean(Anacropora_forbesi_branching),
+            Anacropora_matthaii_pillai_branching = mean(Anacropora_matthaii_pillai_branching),
+            Astreopora_spp_massive = mean(Astreopora_spp_massive),
+            Cyphastrea_spp_massive = mean(Cyphastrea_spp_massive),
+            Favites_spp_ecrusting = mean(Favites_spp_ecrusting),
+            Goniopora_spp_massive = mean(Goniopora_spp_massive),
+            Litophyton_spp_bushy = mean(Litophyton_spp_bushy),
+            Lobophyllia_hemprichii_massive = mean(Lobophyllia_hemprichii_massive),
+            Lobophyllia_spp_encrusting = mean(Lobophyllia_spp_encrusting),
+            Montipora_spp_encrusting = mean(Montipora_spp_encrusting),
+            Montipora_spp_massive = mean(Montipora_spp_massive),
+            Poccilopora_spp_bushy = mean(Poccilopora_spp_bushy),
+            Sarcophyton_spp_massive = mean(Sarcophyton_spp_massive),
+            stony_coral_encrusting = mean(stony_coral_encrusting),
+            Stylophora_pistillata_branching =mean(Stylophora_pistillata_branching))
+
+as.data.frame(Coral.yr.cover.mean1)
+
+Coral.yr.cover.sd1 <- Coral.yr.cover %>%
+  group_by(year) %>%
+  summarise(Acropora_tenella_branching = sd(Acropora_tenella_branching),
+            Anacropora_forbesi_branching = sd(Anacropora_forbesi_branching),
+            Anacropora_matthaii_pillai_branching = sd(Anacropora_matthaii_pillai_branching),
+            Astreopora_spp_massive = sd(Astreopora_spp_massive),
+            Cyphastrea_spp_massive = sd(Cyphastrea_spp_massive),
+            Favites_spp_ecrusting = sd(Favites_spp_ecrusting),
+            Goniopora_spp_massive = sd(Goniopora_spp_massive),
+            Litophyton_spp_bushy = sd(Litophyton_spp_bushy),
+            Lobophyllia_hemprichii_massive = sd(Lobophyllia_hemprichii_massive),
+            Lobophyllia_spp_encrusting = sd(Lobophyllia_spp_encrusting),
+            Montipora_spp_encrusting = sd(Montipora_spp_encrusting),
+            Montipora_spp_massive = sd(Montipora_spp_massive),
+            Poccilopora_spp_bushy = sd(Poccilopora_spp_bushy),
+            Sarcophyton_spp_massive = sd(Sarcophyton_spp_massive),
+            stony_coral_encrusting = sd(stony_coral_encrusting),
+            Stylophora_pistillata_branching = sd(Stylophora_pistillata_branching))
+
+as.data.frame(Coral.yr.cover.sd1)
+
+
 
 # stacked + percent
 Coral_long <- gather(Coral, Transect, Relative_cover, X2022_T1, X2022_T2, X2022_T3, X2023_T1, X2023_T2, X2023_T3, factor_key=TRUE)
@@ -248,10 +317,11 @@ Coral_long.seq <- c("Acropora_tenella_branching",
                     "Sarcophyton_spp_massive")    
 Coral.seq <- factor(Coral_long$Label, levels = Coral_long.seq)
 Tran.seq <- factor(Coral_long$Transect , levels = c('X2023_T3', 'X2023_T2','X2023_T1','X2022_T3','X2022_T2','X2022_T1'))
-coral.col <- c('#3288bd',"#3288BDCC","#3288BD99","#3288BD66",'#99d594',
+coral.col <- c('#3288bd',"#3288BDB3","#3288BD66","#3288BD1A",'#99d594',
                '#fee08b',"#FEE08BCC","#FEE08B99","#FEE08B66","#FEE08B33", 
                '#fc8d59',"#FC8D59CC","#FC8D5999","#FC8D5966",'#d53e4f','#9e0142')
 
+adjustcolor('#3288bd', alpha.f = 0.1) 
 ggplot(Coral_long, aes(fill = Coral.seq, y = Relative_cover, x = Tran.seq)) + 
   geom_bar(position="fill", stat="identity") +
   scale_fill_manual(values = coral.col) +
@@ -266,15 +336,24 @@ SpeciesXMorpho <- Coral$Label
 Coral.yr <- data.frame(SpeciesXMorpho, Coral.2022, Coral.2023)
 colnames(Coral.yr) <- c('SpeciesXMorpho','X2022','X2023')
 
+Coral.yr <- aggregate(Coral.yr[,-1], unique(list(Coral$Label)), sum)
+colnames(Coral.yr) <- c('SpeciesXMorpho','X2022','X2023')
+
+coral.2223 <- 100*(Coral.yr[,2:3]/colSums(Coral.yr[,2:3]))
+coral.2223 <- data.frame(Coral.yr$SpeciesXMorpho, coral.2223)
+coral.2223
+
 Coral.yr.long <- gather(Coral.yr, Year, Relative_cover, X2022, X2023, factor_key=TRUE)
 SpeciesXMorpho <- factor(Coral.yr$SpeciesXMorpho, levels = Coral_long.seq)
 Year. <- factor(Coral.yr.long$Year , levels = c('X2023','X2022'))
+Coral.seq.yr <- factor(Coral.yr.long$SpeciesXMorpho, levels = Coral_long.seq)
 
-ggplot(Coral.yr.long, aes(fill = SpeciesXMorpho, y = Relative_cover, x = Year.)) + 
+ggplot(Coral.yr.long, aes(fill = Coral.seq.yr, y = Relative_cover, x = Year.)) + 
   geom_bar(position="fill", stat="identity") +
   scale_fill_manual(values = coral.col) + 
   coord_flip() + 
   theme_classic()
+
 
 
 ### bleaching conditions
@@ -344,6 +423,8 @@ post.lower <- t(post.bleaching.mean) - t(post.bleaching.sd)
 bleaching.rad <- data.frame(var, pre.mean, pre.upper, pre.lower,
                                  post.mean, post.upper, post.lower)
 
+bleaching.mean.sd <- data.frame( t(pre.bleaching.mean), t(pre.bleaching.sd),
+                                 t(post.bleaching.mean), t(post.bleaching.sd))
 
 
 ggplot(bleaching.rad, aes(x = var, y = pre.mean, group = 1)) +
@@ -467,6 +548,9 @@ AT.post.bleaching.sd <- AT.post.bleaching.per %>%
             Health = sd(Health),
             Partly_Bleached = sd(Partly_Bleached))
 
+AT.post.bleaching.per %>%
+  summarise(Daed.mean = mean(Dead_CCA + Dead_Endolithic_Algae + Dead_Terpios + Dead_Turf),
+            Daed.sd = sd(Dead_CCA + Dead_Endolithic_Algae + Dead_Terpios + Dead_Turf))
 
 AT.post.mean <- t(AT.post.bleaching.mean)
 AT.post.upper <- t(AT.post.bleaching.mean) + t(AT.post.bleaching.sd) 
@@ -474,7 +558,13 @@ AT.post.lower <- t(AT.post.bleaching.mean) - t(AT.post.bleaching.sd)
 AT.bleaching.rad <- data.frame(var,AT.pre.mean, AT.pre.upper, AT.pre.lower,
                                AT.post.mean, AT.post.upper, AT.post.lower)
 
-ggplot(AT.bleaching.rad, aes(x = var, y = AT.pre.mean, group = 1)) +
+
+AT.pre.bleaching.per %>%
+  summarise(Bleached.mean = mean(Bleached + Partly_Bleached),
+            Bleached.sd = sd(Bleached + Partly_Bleached))
+
+
+ggplot(AT.bleaching.rad, aes(x = var, y = AT.post.mean, group = 1)) +
   geom_polygon(fill = NA, colour = '#fbb4ae') +
   geom_polygon(aes(y = AT.pre.upper), fill = adjustcolor('#fbb4ae', alpha.f = 0.5)) +
   geom_polygon(aes(y = AT.pre.lower), fill = 'white') +
@@ -492,17 +582,55 @@ ggplot(AT.bleaching.rad, aes(x = var, y = AT.pre.mean, group = 1)) +
 
 AT.bleaching.per.radar <- as.data.frame(rbind(rep(60,7), rep(0,7), AT.pre.bleaching.per, AT.post.bleaching.per))
 
+
+
+
+
+AN.coral <- benthic_data[c(8:14),c(4:9)]
+AN.coral <- t(AN.coral)
+colnames(AN.coral) <- benthic_data[c(8:14),3]
+Dead_Turf <- AN.coral[,4] + AN.coral[,7]
+AN.coral <- AN.coral[,-4] 
+AN.coral <- as.data.frame(AN.coral[,-6] )
+AN.coral$Dead_Turf <- Dead_Turf
+
+#AN.pre.bleaching <- matrix(AN.coral, ncol = 6, nrow = 6)[c(1:3),]
+#colnames(AN.pre.bleaching) <- colnames(AN.coral)
+AN.pre.bleaching <- AN.coral[c(1:3),]
+AN.pre.bleaching.per <- 100*(colSums(AN.pre.bleaching)/sum(AN.pre.bleaching))
+
+#AN.post.bleaching <- matrix(as.numeric(AN.coral), ncol = 6, nrow = 6)[c(4:6),]
+#colnames(AN.post.bleaching) <- colnames(AN.coral)
+AN.post.bleaching <- as.data.frame(AN.coral[c(4:6),])
+AN.post.bleaching.per <- 100*(colSums(AN.post.bleaching)/sum(AN.post.bleaching))
+typeof(AN.post.bleaching.per)
+
+
+
+AN.post.bleaching.mean <- AN.post.bleaching.per %>%
+  summarise(Bleached = mean(Bleached),
+            Dead_CCA = mean(Dead_CCA),
+            Dead_Endolithic_Algae = mean(Dead_Endolithic_Algae),
+            #Dead_Terpios = mean(Dead_Terpios),
+            Dead_Turf = mean(Dead_Turf),
+            Health = mean(Health),
+            Partly_Bleached = mean(Partly_Bleached))
+
+AN.post.bleaching.sd <- AN.post.bleaching.per %>%
+  summarise(Bleached = sd(Bleached),
+            Dead_CCA = sd(Dead_CCA),
+            Dead_Endolithic_Algae = sd(Dead_Endolithic_Algae),
+            Dead_Terpios = sd(Dead_Terpios),
+            Dead_Turf = sd(Dead_Turf),
+            Health = sd(Health),
+            Partly_Bleached = sd(Partly_Bleached))
+
+AN.post.bleaching.per %>%
+  summarise(Daed.mean = mean(Dead_CCA + Dead_Endolithic_Algae + Dead_Terpios + Dead_Turf),
+            Daed.sd = sd(Dead_CCA + Dead_Endolithic_Algae + Dead_Terpios + Dead_Turf))
+
 ### map
-library(sp)
-library(maps)
-library(maptools)
-library(ggthemes)
-library(rgdal)
-library(ggspatial)
-library(rnaturalearth)
-library(rnaturalearthdata)
-library(sf)
-library(grid)
+
 
 world <- ne_countries(scale = "medium", returnclass = "sf")
 class(world)
@@ -535,6 +663,57 @@ ggplot(data = TW.df.sf) +
                          style = north_arrow_fancy_orienteering) +
   theme(panel.background = element_rect(fill = 'aliceblue')) 
 
+
+
+library(rgdal)
+library(raster)
+
+library(marmap)
+papoue <- getNOAA.bathy(lon1 = 120, lon2 = 121,
+                        lat1 = 22, lat2 = 23, resolution = 0.1)
+
+# Creating color palettes
+blues <- c("lightsteelblue4", "lightsteelblue3",
+           "lightsteelblue2", "lightsteelblue1")
+greys <- c(grey(0.6), grey(0.93), grey(0.99))
+
+plot(papoue, image = TRUE, land = TRUE, lwd = 0.03,
+     bpal = list(c(0, max(papoue), greys),
+                 c(min(papoue), 0, blues)),
+     xlim = c(120.3,120.4), ylim = c(22.3, 22.4))
+# Add coastline
+plot(papoue, n = 1, lwd = 0.4, add = TRUE)
+
+summary(papoue)
+
+# transect - west
+trsect <- get.transect(papoue, 120.33,22.336, 120.36, 22.336, distance = TRUE)
+head(trsect)
+plotProfile(trsect)
+
+# transect - east
+trsect2 <- get.transect(papoue, 120.36,22.336, 120.2, 22.336, distance = TRUE)
+head(trsect2)
+plotProfile(trsect2)
+
+
+
+# Load NW Atlantic xyz data and convert to class bathy
+
+wireframe(unclass(papoue), shade = TRUE, aspect = c(1/2, 0.1))
+
+plot(papoue, xlim = c(120,121),
+     deep = c(-5000, 0), shallow = c(0, 0), step = c(1000, 0),
+     col = c("lightgrey", "black"), lwd = c(0.8, 1),
+     lty = c(1, 1), draw = c(FALSE, FALSE))
+belt <- get.box(papoue, x1 = 120.28, x2 = 120.4, y1 = 22.336, y2 = 22.336,
+                width = 0.1, col = "red")
+
+wireframe(belt, shade = TRUE, zoom = 1.1,
+          aspect = c(1/4, 0.1),
+          screen = list(z = -60, x = -55),
+          par.settings = list(axis.line = list(col = "transparent")),
+          par.box = c(col = rgb(0, 0, 0, 0.1)))
 
 
 
@@ -591,17 +770,6 @@ sst_ltm_over <- data.frame(matrix(unlist(sst_ltm_over),ncol=1)) # transfer the m
 colnames(sst_ltm_over) <- 'sst_ltm_over'
 
 
-##### deal with it later
-sst_sd_mon <- as.data.frame(sst_sd_mon)
-sst_sd_mon_over <- list() 
-for (i in 1:141){
-  sst_sd_mon_over[[i]] <- sst_sd_mon[,i]
-}
-sst_sd_mon_over <- data.frame(matrix(unlist(sst_sd_mon_over),ncol=1)) # transfer the matrix to df so that it can be used for spatialgriddf 
-colnames(sst_sd_mon_over) <- 'sst_sd_mon_over'
-###
-
-
 ### overlap sampling site and data
 poi <- data.frame(lon = 120.35706, lat = 22.33635, # extract the coordinates of sampling locations
                   stringsAsFactors=F) 
@@ -645,24 +813,23 @@ BAA.df <-  data.frame(date, BAA.poi)
 date <- as.Date(date, format = "%y-%m-%d")
 df <- data.frame(date, sst.poi, DHW.poi, BAA.poi)
 
-ggplot(data = sst.df, aes(x = date, y = sst.poi))+
-  geom_line(color = "#00AFBB", size = 2)+
-  theme_bw()
+## 2022 & 2023 ave SST
+mean(sst.poi[1:365])
+sd(sst.poi[1:365])
+mean(sst.poi[366:614])
+sd(sst.poi[366:614])
 
-ggplot(data = DHW.df, aes(x = date, y = DHW.poi))+
-  geom_area(data = DHW.df, aes(x = date, y = DHW.poi), 
-            alpha = 0.5, position = position_dodge(0.8), color ='red', fill ='red') +
-  theme_bw()+
-  facet_wrap(~date, strip.position = "bottom")
+## 2022 & 2023 summer (Jul + Aug) ave SST
+mean(sst.poi[181:242])
+sd(sst.poi[181:242])
+mean(sst.poi[546:607])
+sd(sst.poi[546:607])
 
-ggplot()+
-  geom_line(data = sst.df, aes(x = date, y = sst.poi), color = "black", size = 2)+
-  geom_area(data = DHW.df, aes(x = date, y = DHW.poi*2), 
-            alpha = 0.5, position = position_dodge(0.8), color ='red', fill ='red') +
-  scale_y_continuous(name = "Temperature (Celsius °)",  
-                     sec.axis = sec_axis(~.*0.5, name="DHW"))+
-  theme_bw() 
+## DHW peak in 2022 and 2023
+max(DHW.poi[1:365])
+max(DHW.poi[366:614])
 
+# plot
 ggplot(data = df)+
   xlab('Date')+
   geom_line( aes(x = date, y = sst.poi), color = "black", size = 2)+
@@ -737,3 +904,4 @@ ggplot(data = df)+
   scale_x_date(breaks = date_breaks("1 month"), date_labels="%b")+
   geom_line( aes(x = date, y = sst.poi-6), color = "black", size = 2)+
   theme_bw()
+
