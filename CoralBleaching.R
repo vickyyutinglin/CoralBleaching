@@ -905,3 +905,58 @@ ggplot(data = df)+
   geom_line( aes(x = date, y = sst.poi-6), color = "black", size = 2)+
   theme_bw()
 
+
+
+
+
+
+
+## SST long-term
+#SST <- nc_open('dhw_5km_XLQ_1985-2023.nc')
+
+
+## SST long-term
+#SST <- nc_open('C:\\Users\\Vicky\\Downloads\\dhw_5km_20230901-1031.nc')
+SST <- nc_open('dhw_5km_XLQ_20222023.nc')
+
+#### extract data ####
+sst<-'CRW_SST'
+lon<-ncvar_get(SST,'longitude')
+nlon<-dim(lon)
+lat<- ncvar_get(SST,'latitude')
+nlat<-dim(lat)
+tm <- ncvar_get(SST,'time')
+
+DHW <- 'CRW_DHW'
+BAA <- 'CRW_BAA'
+#### Check timeunit and alter date format ####
+date <-as.POSIXct(tm,origin='1970-01-01',tz='')
+Date <- as.Date(date, format = "%y-%m-%d") # keep only the date (y-m-d) information
+
+#year <- as.numeric(unlist(strsplit(as.character(date),'-'))[seq(1,nt*3,by=3)])
+#month <- as.numeric(unlist(strsplit(as.character(date),'-'))[seq(2,nt*3,by=3)])
+
+sst_array <- ncvar_get(SST,sst)
+dim(sst_array)
+sst_array_matrix <- as.matrix(sst_array)
+
+DHW_array <- ncvar_get(SST,DHW)
+dim(DHW_array)
+BAA_array <- ncvar_get(SST,BAA)
+dim(BAA_array)
+
+nc_close(SST)
+
+
+###
+
+
+sst_mean <- mean(sst_array_matrix)
+sst_abn <- sst_array_matrix - sst_mean
+
+
+sst_plot <- data.frame(Date, sst_abn)
+
+ggplot(sst_plot) + 
+  geom_bar(aes(x = Date, y = sst_abn), stat = 'identity')
+

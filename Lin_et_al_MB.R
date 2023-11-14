@@ -1,4 +1,4 @@
-### Library
+rm(list=ls())
 library(ggplot2)
 library(tidyr)
 library(vegan)
@@ -18,11 +18,9 @@ library(sf)
 library(grid)
 library(marmap)
 
-### Directory 
-setwd('C:/Users/Vicky/Dropbox/FRE - Vicky@DP/Publication/On the way to publish/12. XLQ mesophotic bleacing event/Data')
 
-### Map & depth profile of the sampling site - Vanice
-# Figure 1a - world
+
+
 world <- ne_countries(scale = "medium", returnclass = "sf")
 ggplot(data = world) +
   geom_sf(color = "black", fill = 'antiquewhite')+
@@ -36,10 +34,8 @@ ggplot(data = world) +
   geom_rect(xmin = 119.8,  ymin = 21.8,  xmax = 120.3,  ymax = 22.3,
             fill = NA,  colour = "black",  size = 1)
 
-# Figure 1b - Vanice
-TW <- readOGR('TWN_adm0.shp') # import map data
-TW.df.sf <- st_as_sf(TW, coords = c("long", "lat"), 
-                     crs = "+proj=longlat +ellps=WGS84")
+TW <- readOGR('Data/TWN_adm0.shp') # import map data
+TW.df.sf <- st_as_sf(TW, coords = c("long", "lat"), crs = "+proj=longlat +ellps=WGS84")
 
 ggplot(data = TW.df.sf) +
   geom_sf(color = "black", fill = 'antiquewhite')+
@@ -55,7 +51,7 @@ ggplot(data = TW.df.sf) +
                colour="red", size = 1, linetype = 'dashed')+
   theme(panel.background = element_rect(fill = 'aliceblue')) 
 
-# Figure 1c - depth profile
+
 Van <- getNOAA.bathy(lon1 = 120, lon2 = 121, lat1 = 22, lat2 = 23, 
                      resolution = 0.1) # download the bathymetric data
 trsect <- get.transect(Van, 120.31000, 22.33635, 120.36000, 22.33635, distance = TRUE) # add the transect to extract depth profile
@@ -63,9 +59,7 @@ head(trsect) # check the information of transects
 plotProfile(trsect) # plot the depth profile
 
 
-### Thermal environment
-# Extract thermal data
-SST <- nc_open('dhw_5km_XLQ_202223.nc') # open the nc file
+SST <- nc_open('Data/dhw_5km_XLQ_20222023.nc') # open the nc file
 sst <-'CRW_SST' # get SST variables
 DHW <- 'CRW_DHW' # get DHW variables
 BAA <- 'CRW_BAA' # get BAA variables
@@ -86,61 +80,27 @@ BAA_array <- ncvar_get(SST,BAA) # change BAA data into array
 dim(BAA_array)
 nc_close(SST) # close the nc file
 
-# A loop to make the arrangement of the longitude correct
-sst_daily <- as.data.frame(sst_array[,,1])  
-sst_ltm_over <- list() 
-for (i in 1:41){ 
-  sst_ltm_over[[i]] <- sst_daily[,i]
-}
-sst_ltm_over <- data.frame(matrix(unlist(sst_ltm_over),ncol=1)) # transfer the matrix to df so that it can be used for spatialgriddf 
-colnames(sst_ltm_over) <- 'sst_ltm_over' # add column name
-
-# Look for the grid that contain the sampling site 
-poi <- data.frame(lon = 120.35706, lat = 22.33635, # extract the coordinates of sampling site
-                  stringsAsFactors=F) 
-coordinates(poi) <- c('lon', 'lat') # assign the lon and lat
-proj4string(poi) <- CRS("+proj=longlat +datum=WGS84 +no_defs") # assign the CRS
-grid_exp_df <- expand.grid(lon=lon, lat=lat) # expand the grid
-grid_exp_df[,'seq'] <- seq_len(nrow(grid_exp_df)) # add the sequence to the grid
-sst_pt <- SpatialPointsDataFrame(coords=grid_exp_df[, c("lon", "lat")], data=grid_exp_df[, "seq", drop=F]) # create SpatialPointsDataFrame with grid's sequence
-sst_topo <- points2grid(sst_pt, tolerance = 0.000183117) # create the topography for SpatialGridDataFrame
-sst_grid <- SpatialGridDataFrame(sst_topo,data = data.frame(sst_ltm_over, grid_exp_df$seq),  # create SpatialGridDataFrame that has SST data and the sequence of grids
-                                 proj4string = CRS("+proj=longlat +datum=WGS84 +no_defs"))
-over_intp_non <- over(poi,sst_grid) # overlap the sampling site point and SST grid to see where the sampling site locates
-
-plot(sst_grid , ylim = c(21,24), xlim = c(120,123),  # plot the SST data
-     breaks = seq(14,28,by=1), at = seq(14,28,by=1),
-     col = c('purple','dark blue', 'blue', 'dark cyan', 'cyan','dark green', 'green', 'gold','yellow', 'dark orange', 'orange','pink','dark red','red')) # plot the wave grid system
-plot(poi, add = T, pch = 16, col = 'red') # plot the sampling locations
-
-
-# sampling site is on the 582th grid (column = 8; row = 15)
-sst.poi <- sst_array[8,15,] # extract SST data of the sampling site
-DHW.poi <- DHW_array[8,15,] # extract DHW data of the sampling site
-BAA.poi <- BAA_array[8,15,] # extract BAA data of the sampling site
-
+sst.poi <- as.matrix(sst_array) # extract SST data of the sampling site
+DHW.poi <- as.matrix(DHW_array) # extract DHW data of the sampling site
+BAA.poi <- as.matrix(BAA_array) # extract BAA data of the sampling site
 sst.df <- data.frame(date, sst.poi) # create a dataframe for SST of the sampling site
 DHW.df <- data.frame(date, DHW.poi) # create a dataframe for DHW of the sampling site
 BAA.df <- data.frame(date, BAA.poi) # create a dataframe for BAA of the sampling site
 df <- data.frame(date, sst.poi, DHW.poi, BAA.poi) # combine 3 dataframes
 
-## 2022 & 2023 mean SST
-mean(sst.poi[1:365])
-sd(sst.poi[1:365])
-mean(sst.poi[366:614])
-sd(sst.poi[366:614])
+round(mean(sst.poi[1:365]),1)
+round(sd(sst.poi[1:365]),1)
+round(mean(sst.poi[366:614]),1)
+round(sd(sst.poi[366:614]),1)
 
-## 2022 & 2023 summer (Jul + Aug) mean SST
-mean(sst.poi[181:242])
-sd(sst.poi[181:242])
-mean(sst.poi[546:607])
-sd(sst.poi[546:607])
+round(mean(sst.poi[181:242]),1)
+round(sd(sst.poi[181:242]),1)
+round(mean(sst.poi[546:607]),1)
+round(sd(sst.poi[546:607]),1)
 
-## DHW peak in 2022 and 2023
-max(DHW.poi[1:365])
-max(DHW.poi[366:614])
+round(max(DHW.poi[1:365]),1)
+round(max(DHW.poi[366:614]),1)
 
-# Figure 2
 ggplot(data = df)+
   xlab('Date')+
   geom_line(aes(x = date, y = sst.poi-6), color = "black", size = 1) +
@@ -162,11 +122,8 @@ ggplot(data = df)+
   scale_x_date(breaks = date_breaks("1 month"), limits = as.Date(c('2022-01-01','2023-10-30')), date_labels="%b")+
   theme_bw()
 
-### Change in benthic composition & recovery of corals
-# Import data
-benthic_data <- read.csv('benthic_data.csv', sep = ',', header = T)
+benthic_data <- read.csv('Data/benthic_data.csv', sep = ',', header = T)
 
-# Major benthic categories absolute covers
 maj <- t(aggregate(benthic_data[,-c(1,2,3,10)], list(benthic_data$Major_cate), sum))
 maj.lab <- maj[1,]
 maj.cov <- as.data.frame(matrix( as.numeric(maj[2:7,]), nrow = 6, ncol = 8))
@@ -189,7 +146,6 @@ maj.yr <- round(rbind(maj.yr.2022,maj.yr.2023),1) # cover matrix
 colnames(maj.yr) <- maj.lab
 row.names(maj.yr) <- c('2022','2023')
 
-# Major benthic categories abdolute covers with corals' bleaching status
 maj.ble <- benthic_data[,-c(2,10)]
 maj.ble$maj.ble <- with(maj.ble, paste(Major_cate, Bleached_status, sep = "_"))
 maj.ble$Major_cate <- NULL
@@ -228,19 +184,15 @@ maj.ble.seq <- c("Algae_",
 
 maj.ble.col <- c('#66c2a5','#b3b3b3',"#E78AC399",'#e78ac3',"#8DA0CB66","#8DA0CBB3",'#8da0cb',
                  '#fc8d62',"#E5C49499","#E5C494CC",'#e5c494',"#FFD92FB3",'#ffd92f',"#A6D85466","#A6D854B3",'#a6d854')
-
 maj.ble.yr.long <- gather(maj.ble.yr, Year, Absolute_cover, X2022, X2023, factor_key=TRUE)
 Major_Category <- factor(maj.ble.yr.long$Major_Category_Bleached, levels = maj.ble.seq)
 Year. <- factor(maj.ble.yr.long$Year , levels = c('X2023','X2022'))
-
-# Figure 4a
 ggplot(maj.ble.yr.long, aes(fill = Major_Category, y = Absolute_cover, x = Year.)) + 
   geom_bar(position="fill", stat="identity") +
   scale_fill_manual(values = maj.ble.col) + 
   coord_flip() + 
   theme_classic()
 
-# Comparing benthic composition between 2022 & 2023 (transect level)
 maj.per.yr <- (maj.cov[,-9]/rowSums(maj.cov[,-9]))*100
 maj.per.yr$Year <- c(rep('2022',3),rep('2023',3))
 
@@ -270,14 +222,13 @@ maj.per.yr.sd <- gather(maj.per.yr.sd, maj, value = 'cover', 2:9)
 maj.per.yr.bar <- cbind(maj.per.yr.mean[,1:2], round(maj.per.yr.mean$cover,1), round(maj.per.yr.sd$cover,1)) # benthic mean cover & SD
 colnames(maj.per.yr.bar) <- c('Year', 'Major', 'Cover', 'SD')
 
-# SuUpplementary Information 1
+maj.col <- c('#66c2a5','#b3b3b3','#e78ac3','#8da0cb','#fc8d62','#e5c494','#ffd92f','#a6d854')
 ggplot(maj.per.yr.bar, aes(x = Year, y = Cover, fill = Major)) +
   geom_bar(stat = "identity") +
   geom_errorbar(aes(ymin = Cover-SD, ymax = Cover+SD), position =  "dodge", width = 0.2) +
   facet_wrap(~Major, scales = "free")+
   scale_fill_manual(values = maj.col)
 
-### Coral assemblage
 HC <- benthic_data %>% filter(Major_cate=='Hard_corals')
 SC <- benthic_data %>% filter(Major_cate=='Soft_corals')
 Coral <- benthic_data %>% filter(Major_cate=='Soft_corals'|Major_cate=='Hard_corals')
@@ -335,7 +286,6 @@ coral.per.yr.sd <- gather(Coral.yr.cover.sd1, coral, value = 'cover', 2:17)
 coral.per.yr.bar <- cbind(col.per.yr.mean[,1:2], round(col.per.yr.mean$cover,1), round(maj.per.yr.sd$cover,1)) # benthic mean cover & SD
 colnames(coral.per.yr.bar) <- c('Year', 'Coral', 'Cover', 'SD')
 
-# Figure 4b
 Coral_long <- gather(Coral, Transect, Relative_cover, X2022_T1, X2022_T2, X2022_T3, X2023_T1, X2023_T2, X2023_T3, factor_key=TRUE)
 Coral_long.seq <- c("Acropora_tenella_branching",          
                     "Anacropora_forbesi_branching",        
@@ -382,8 +332,6 @@ ggplot(Coral.yr.long, aes(fill = Coral.seq.yr, y = Relative_cover, x = Year.)) +
   coord_flip() + 
   theme_classic()
 
-
-### Coral bleaching status
 bleaching <- t(aggregate(benthic_data[,-c(1,2,3,10)], list(benthic_data$Bleached_status), sum))
 bleaching <- bleaching[,-1]; colnames(bleaching) <- bleaching[1,]
 
@@ -443,7 +391,6 @@ colnames(post.bleaching.2023) <- c('coral', 'mean', 'sd')
 post.bleaching.2023$year <- rep('2023',7)
 bleaching.coral <- rbind(post.bleaching.2022,post.bleaching.2023)
 
-# Figure 5a - Radar plot
 var <- colnames(pre.bleaching.per)
 pre.mean <- t(pre.bleaching.mean)
 pre.upper <- t(pre.bleaching.mean) + t(pre.bleaching.sd) 
@@ -454,9 +401,6 @@ post.upper <- t(post.bleaching.mean) + t(post.bleaching.sd)
 post.lower <- t(post.bleaching.mean) - t(post.bleaching.sd)
 bleaching.rad <- data.frame(var, pre.mean, pre.upper, pre.lower,
                             post.mean, post.upper, post.lower)
-
-#bleaching.mean.sd <- data.frame( t(pre.bleaching.mean), t(pre.bleaching.sd),
-#                                 t(post.bleaching.mean), t(post.bleaching.sd))
 
 ggplot(bleaching.rad, aes(x = var, y = pre.mean, group = 1)) +
   geom_polygon(fill = NA, colour = '#fbb4ae') +
@@ -470,7 +414,9 @@ ggplot(bleaching.rad, aes(x = var, y = pre.mean, group = 1)) +
   coord_polar() +
   labs(x = "", y = "")
 
-# Bleaching status of A. tenella
+AT.coral <- benthic_data[c(1:7),c(4:9)]
+AT.coral <- t(AT.coral)
+colnames(AT.coral) <- benthic_data[c(1:7),3]
 AT.pre.bleaching <- matrix(as.numeric(AT.coral), ncol = 7, nrow = 6)[c(1:3),]
 colnames(AT.pre.bleaching) <- colnames(AT.coral)
 AT.pre.bleaching.per <- as.data.frame(100*(AT.pre.bleaching/rowSums(AT.pre.bleaching)))
@@ -488,7 +434,6 @@ AT.post.bleaching.cb <- cbind(round(AT.post.bleaching.per.mean,1), round(AT.post
 AT.bleaching <- data.frame(c(rep('2022',7),rep('2023',7)), rbind(AT.pre.bleaching.cb,AT.post.bleaching.cb))
 colnames(AT.bleaching) <- c('year','mean','sd')
 
-# Figure 5b - radar plot
 AT.pre.upper <- as.numeric(AT.pre.bleaching.per.mean + AT.pre.bleaching.per.sd)
 AT.pre.lower <- as.numeric(AT.pre.bleaching.per.mean - AT.pre.bleaching.per.sd)
 AT.post.upper <- as.numeric(AT.post.bleaching.per.mean + AT.post.bleaching.per.sd)
@@ -509,4 +454,3 @@ ggplot(AT.bleaching.rad, aes(x = var, y = AT.pre.bleaching.per.mean, group = 1))
   theme() + 
   coord_polar() +
   labs(x = "", y = "")
-

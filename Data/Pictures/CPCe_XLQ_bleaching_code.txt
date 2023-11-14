@@ -1,0 +1,91 @@
+DFDFDF
+DFDFDF
+16
+"CR", "Coral",80EEEE
+"SF", "Soft Coral",FF8040
+"HC", "Hard Coral",FF8042
+"AG", "Algae",00FF40
+"SP", "Sponge",FFFF00
+"OT", "Other Live",804000
+"BS", "Bare Substrate",408080
+"ZO", "Zoanthid",800040
+"AT", "Antipatharia",88FFFF
+"AS", "Ascidian",FF0080
+"AN", "Anemone",8000FF
+"HY", "Hydrozoan",7F7F7F
+"CY", "Cyanobacteria",008040
+"BR", "Bryzoan",FF80C0
+"UNK", "Unknown",3F3F3F
+"TWS", "Tape, wand, shadow",674EA7
+"hc", "hard_coral", "HC"
+"atbr", "Acropora_tenella", "CR"
+"atBL", "Acropora_tenella_branching_bleached", "CR"
+"atPB", "Acropora_tenella_branching_partly_bleached", "CR"
+"atCA", "Acropora_tenella_branching_dead_CCA", "CR"
+"atEA", "Acropora_tenella_branching_dead_Endolithic_algae", "CR"
+"atTE", "Acropora_tenella_branching_dead_Terpios", "CR"
+"atTU", "Acropora_tenella_branching_dead_Turf", "CR"
+"asmp", "Anacropora_matthaii&pillai_branching", "CR"
+"amPB", "Anacropora_matthaii&pillai_branching_partly_bleached", "CR"
+"amTU", "Anacropora_matthaii&pillai_branching_dead_Turf", "CR"
+"asbr", "Anacropora_forbesi_branching", "CR"
+"asBL", "Anacropora_forbesi_branching_bleached", "CR"
+"asPB", "Anacropora_forbesi_branching_partly_bleached", "CR"
+"asTU", "Anacropora_forbesi_branching_deaf_turf", "CR"
+"asma", "Astreopora_spp_massive", "CR"
+"asPB", "Astreopora_spp_encrusting_partly_bleached", "CR"
+"cyma", "Cyphastrea_spp_massive", "CR"
+"cyBL", "Cyphastrea_spp_massive_bleached", "CR"
+"ecen", "Echinopora_spp_ecrusting", "CR"
+"faen", "Favites_spp_ecrusting", "CR"
+"goBL", "Goniopora_spp_massive_bleached", "CR"
+"loen", "Lobophyllia_spp_encrusting", "CR"
+"lohe", "Lobophyllia_hemprichii_massive", "CR"
+"moen", "Montipora_spp_encrusting", "CR"
+"moPB", "Montipora_spp_massive_partly_bleached", "CR"
+"pobu", "Poccilopora_spp_bushy", "CR"
+"psbu", "Psammocora_stellata_bushy", "CR"
+"shEA", "Seriatopora_hystrix_bushy_Endolithic_algae", "CR"
+"spbr", "Stylophora_pistillata_branching", "CR"
+"sten", "stony_coral_encrusting", "CR"
+"libu", "Litophyton_spp_bushy", "SF"
+"liPB", "Litophyton_spp_bushy_partly_bleached", "SF"
+"saBL", "Sarcophyton_spp_massive_bleached", "SF"
+"hali", "Halimeda", "AG"
+"cca", "Crustose coralline algae", "AG"
+"padi", "Padina", "AG"
+"peag", "Peyssonnelia", "AG"
+"agfi", "Filamentous (turf)", "AG"
+"spar", "Arborescent sponge", "SP"
+"spbr", "Branching-repent sponge", "SP"
+"spen", "Encrusting sponge", "SP"
+"spma", "Massive sponge", "SP"
+"zoma", "Massive zoanthids", "ZO"
+"atar", "Arborescent antipatharian", "AT"
+"ascl", "Clustered ascidian", "AS"
+"anen", "Encrusting anemone", "AN"
+"hypl", "Plumose hydrozoan", "HY"
+"brar", "Arborescent bryzoan", "BR"
+"cyfi", "Filamentous cyanobacteria", "CY"
+"otcr", "Other - crinoid", "OT"
+"otst", "Other - Stephanoscyphus racemosum", "OT"
+"otot", "Other (Other free-living organisms)", "OT"
+"rost", "rock_stable", "BS"
+"list", "limestone_stable", "BS"
+"sabs", "sand", "BS"
+"rubs", "rubble_unstable", "BS"
+"unun", "Unrecognized_unstable", "UNK"
+"tatw", "Tape", "TWS"
+NOTES,NOTES,NOTES
+"DW", "Dead for a while", "NA"
+"RD", "Recently Dead", "NA"
+"BL", "Bleached", "NA"
+"PB", "Partially Bleached", "NA"
+"TE", "Terpios spp", "NA"
+"TU", "Turf", "NA"
+"DI", "Disease", "NA"
+"CA", "crustose coralline algae", "NA"
+"EA", "Endolithic algae", "NA"
+"<5", "Colony size <5 cm)", "NA"
+"FI", "Filet", "NA"
+"DBT", "Doubtful identification", "NA"
