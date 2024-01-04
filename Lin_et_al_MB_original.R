@@ -58,14 +58,14 @@ ggplot(data = TW.df.sf) +
 # Figure 1c - depth profile
 Van <- getNOAA.bathy(lon1 = 120, lon2 = 121, lat1 = 22, lat2 = 23, 
                      resolution = 0.1) # download the bathymetric data
-trsect <- get.transect(Van, 120.31000, 22.33635, 120.36000, 22.33635, distance = TRUE) # add the transect to extract depth profile
+trsect <- get.transect(Van, 120.32000, 22.337, 120.3500, 22.337, distance = TRUE) # add the transect to extract depth profile
 head(trsect) # check the information of transects
 plotProfile(trsect) # plot the depth profile
 
 
 ### Thermal environment
 # Extract thermal data
-SST <- nc_open('dhw_5km_XLQ_20222023.nc') # open the nc file
+SST <- nc_open('dhw_5km_XLQ_20222023_full.nc') # open the nc file
 sst <-'CRW_SST' # get SST variables
 DHW <- 'CRW_DHW' # get DHW variables
 BAA <- 'CRW_BAA' # get BAA variables
@@ -101,11 +101,11 @@ round(sd(sst.poi[1:365]),1)
 round(mean(sst.poi[366:614]),1)
 round(sd(sst.poi[366:614]),1)
 
-## 2022 & 2023 summer (Jul + Aug) mean SD SST
-round(mean(sst.poi[181:242]),1)
-round(sd(sst.poi[181:242]),1)
-round(mean(sst.poi[546:607]),1)
-round(sd(sst.poi[546:607]),1)
+## 2022 & 2023 summer (Jun ~ Sep) mean SD SST
+round(mean(sst.poi[151:272]),1)
+round(sd(sst.poi[151:272]),1)
+round(mean(sst.poi[516:637]),1)
+round(sd(sst.poi[516:637]),1)
 
 ## DHW peak in 2022 and 2023
 round(max(DHW.poi[1:365]),1)
@@ -130,13 +130,13 @@ ggplot(data = df)+
   geom_area(data = filter(df, BAA.poi == 4& date > '2022-12-30'), aes(x = date, y = DHW.poi*2), fill = "darkred", alpha = 0.8) +
   scale_y_continuous(name = "Temperature (°C)", breaks=c(0, 5, 10, 15, 20, 25, 30), labels=c(6, 11, 16 ,21, 26, 31, 36), limits=c(0,25),
                      sec.axis = sec_axis(~./2, name="DHW (°C-weeks)"), expand = c(0,0))+
-  scale_x_date(breaks = date_breaks("1 month"), limits = as.Date(c('2022-01-01','2023-10-30')), date_labels="%b")+
+  scale_x_date(breaks = date_breaks("1 month"), limits = as.Date(c('2022-01-01','2023-12-31')), date_labels="%b")+
   theme_bw()
 
 ### Change in benthic composition & recovery of corals
 # Import data
 benthic_data <- read.csv('benthic_data.csv', sep = ',', header = T)
-
+unique(benthic_data$Label)
 # Major benthic categories absolute covers
 maj <- t(aggregate(benthic_data[,-c(1,2,3,10)], list(benthic_data$Major_cate), sum))
 maj.lab <- maj[1,]
@@ -153,7 +153,7 @@ maj.yr <- maj.cov %>%
             Other.life = sum(Other_live),
             Soft.corals = sum(Soft_corals),
             Sponges = sum(Sponges),
-            Turf = sum(Turf_cyanobacteria))
+            Turf = sum(Turf))
 maj.yr.2022 <- 100 * (as.numeric(maj.yr[1,2:9])/sum(as.numeric(maj.yr[1,2:9])))
 maj.yr.2023 <- 100 * (as.numeric(maj.yr[2,2:9])/sum(as.numeric(maj.yr[2,2:9])))
 maj.yr <- round(rbind(maj.yr.2022,maj.yr.2023),1) # cover matrix
@@ -181,25 +181,26 @@ colnames(maj.ble.2223) <- maj.ble.yr$Major_Category_Bleached
 rownames(maj.ble.2223) <- c('2022','2023')
 
 # Figure 4a
-maj.ble.seq <- c("Algae_",                                  
-                 "Bare_substrate_",   
+maj.ble.seq <- c("Turf_" ,
+                 "Turf_Dead_Turf" ,
+                 "Algae_", 
+                 "CCA_", 
                  "CCA_Dead_CCA",  
-                 "CCA_",                                    
-                 "Hard_corals_Bleached",                    
-                 "Hard_corals_Partly_Bleached",   
                  "Hard_corals_Health",
-                 "Other_live_",                             
-                 "Soft_corals_Bleached",                    
-                 "Soft_corals_Partly_Bleached" ,   
+                 "Hard_corals_Partly_Bleached", 
+                 "Hard_corals_Bleached",  
                  "Soft_corals_Health",
-                 "Sponges_Dead_Terpios"  ,      
+                 "Soft_corals_Partly_Bleached" ,  
+                 "Soft_corals_Bleached",  
                  "Sponges_" ,
-                 "Turf_cyanobacteria_Dead_Endolithic_Algae",
-                 "Turf_cyanobacteria_Dead_Turf" ,
-                 "Turf_cyanobacteria_" )
+                 "Sponges_Dead_Sponge"  , # Sponges_on_dead_corals
+                 "Other_live_",   
 
-maj.ble.col <- c('#66c2a5','#b3b3b3',"#E78AC399",'#e78ac3',"#8DA0CB66","#8DA0CBB3",'#8da0cb',
-                 '#fc8d62',"#E5C49499","#E5C494CC",'#e5c494',"#FFD92FB3",'#ffd92f',"#A6D85466","#A6D854B3",'#a6d854')
+                 "Bare_substrate_",   
+                 "Bare_substrate_Dead_Endolithic_Algae")
+
+maj.ble.col <- c('#a6d854',"#A6D854B3", '#66c2a5','#e78ac3',"#E78AC399",'#8da0cb',"#8DA0CBB3","#8DA0CB66",
+                 '#e5c494',"#E5C494CC","#E5C49499",'#ffd92f',"#FFD92FB3",'#fc8d62','#b3b3b3' ,"#B3B3B3B3" )
 maj.ble.yr.long <- gather(maj.ble.yr, Year, Absolute_cover, X2022, X2023, factor_key=TRUE)
 Major_Category <- factor(maj.ble.yr.long$Major_Category_Bleached, levels = maj.ble.seq)
 Year. <- factor(maj.ble.yr.long$Year , levels = c('X2023','X2022'))
@@ -215,37 +216,39 @@ maj.per.yr$Year <- c(rep('2022',3),rep('2023',3))
 
 maj.per.yr.mean1 <- maj.per.yr %>%
   group_by(Year) %>%
-  summarise(Algae = mean(Algae),
-            Bare.substrate = mean(Bare_substrate),
+  summarise(Macroalgae = mean(Algae),
+            Bare.substrates = mean(Bare_substrate),
             CCA = mean(CCA),
-            Hard.corals = mean(Hard_corals),
+            Stony.corals = mean(Hard_corals),
             Other.life = mean(Other_live),
             Soft.corals = mean(Soft_corals),
             Sponges = mean(Sponges),
-            Turf = mean(Turf_cyanobacteria))
+            Turf.algae = mean(Turf))
 maj.per.yr.mean <- gather(maj.per.yr.mean1, maj, value = 'cover', 2:9)
 
 maj.per.yr.sd <- maj.per.yr %>%
   group_by(Year) %>%
-  summarise(Algae = sd(Algae),
-            Bare.substrate = sd(Bare_substrate),
+  summarise(Macroalgae = sd(Algae),
+            Bare.substrates = sd(Bare_substrate),
             CCA = sd(CCA),
-            Hard.corals = sd(Hard_corals),
+            Stony.corals = sd(Hard_corals),
             Other.life = sd(Other_live),
             Soft.corals = sd(Soft_corals),
             Sponges = sd(Sponges),
-            Turf = sd(Turf_cyanobacteria))
+            Turf.algae = sd(Turf))
 maj.per.yr.sd <- gather(maj.per.yr.sd, maj, value = 'cover', 2:9)
-maj.per.yr.bar <- cbind(maj.per.yr.mean[,1:2], round(maj.per.yr.mean$cover,1), round(maj.per.yr.sd$cover,1)) # benthic mean cover & SD
+#maj.per.yr.bar <- cbind(maj.per.yr.mean[,1:2], round(maj.per.yr.mean$cover,1), round(maj.per.yr.sd$cover,1)) # benthic mean cover & SD
+maj.per.yr.bar <- cbind(maj.per.yr.mean[,1:2], maj.per.yr.mean$cover, maj.per.yr.sd$cover) # benthic mean cover & SD
 colnames(maj.per.yr.bar) <- c('Year', 'Major', 'Cover', 'SD')
 
-# Supplementary Information 2
-maj.col <- c('#66c2a5','#b3b3b3','#e78ac3','#8da0cb','#fc8d62','#e5c494','#ffd92f','#a6d854')
+# Supplementary Information 3
+maj.col <- c('#b3b3b3','#e78ac3','#66c2a5','#8da0cb','#fc8d62','#ffd92f','#e5c494','#a6d854')
 ggplot(maj.per.yr.bar, aes(x = Year, y = Cover, fill = Major)) +
   geom_bar(stat = "identity") +
   geom_errorbar(aes(ymin = Cover-SD, ymax = Cover+SD), position =  "dodge", width = 0.2) +
-  facet_wrap(~Major, scales = "free")+
-  scale_fill_manual(values = maj.col)
+  facet_wrap(~Major, scales = "free_y")+
+  scale_fill_manual(values = maj.col) + 
+  scale_y_continuous(expand = expansion(mult = c(0.1, 0.2)))
 
 ### Coral assemblage
 HC <- benthic_data %>% filter(Major_cate=='Hard_corals')
@@ -365,7 +368,7 @@ pre.bleaching.mean <- pre.bleaching.per %>%
   summarise(Bleached = mean(Bleached),
             Dead_CCA = mean(Dead_CCA),
             Dead_Endolithic_Algae = mean(Dead_Endolithic_Algae),
-            Dead_Terpios = mean(Dead_Terpios),
+            Dead_Sponge = mean(Dead_Sponge),
             Dead_Turf = mean(Dead_Turf),
             Health = mean(Health),
             Partly_Bleached = mean(Partly_Bleached))
@@ -375,14 +378,14 @@ pre.bleaching.sd <- pre.bleaching.per %>%
   summarise(Bleached = sd(Bleached),
             Dead_CCA = sd(Dead_CCA),
             Dead_Endolithic_Algae = sd(Dead_Endolithic_Algae),
-            Dead_Terpios = sd(Dead_Terpios),
+            Dead_Sponge = sd(Dead_Sponge),
             Dead_Turf = sd(Dead_Turf),
             Health = sd(Health),
             Partly_Bleached = sd(Partly_Bleached))
 pre.bleaching.sd1 <- gather(pre.bleaching.sd, coral, value = 'sd', 1:7)
-post.bleaching.2022 <- data.frame(pre.bleaching.mean1,pre.bleaching.sd1$sd)
-colnames(post.bleaching.2022) <- c('coral', 'mean', 'sd')
-post.bleaching.2022$year <- rep('2022',7)
+pre.bleaching.2022 <- data.frame(pre.bleaching.mean1,pre.bleaching.sd1$sd)
+colnames(pre.bleaching.2022) <- c('coral', 'mean', 'sd')
+pre.bleaching.2022$year <- rep('2022',7)
 
 post.bleaching <- as.data.frame(matrix(as.numeric(bleaching[-1,]), ncol = 7, nrow = 6)[c(4:6),])
 colnames(post.bleaching) <- colnames(bleaching)
@@ -392,7 +395,7 @@ post.bleaching.mean <- post.bleaching.per %>%
   summarise(Bleached = mean(Bleached),
             Dead_CCA = mean(Dead_CCA),
             Dead_Endolithic_Algae = mean(Dead_Endolithic_Algae),
-            Dead_Terpios = mean(Dead_Terpios),
+            Dead_Sponge = mean(Dead_Sponge),
             Dead_Turf = mean(Dead_Turf),
             Health = mean(Health),
             Partly_Bleached = mean(Partly_Bleached))
@@ -402,7 +405,7 @@ post.bleaching.sd <- post.bleaching.per %>%
   summarise(Bleached = sd(Bleached),
             Dead_CCA = sd(Dead_CCA),
             Dead_Endolithic_Algae = sd(Dead_Endolithic_Algae),
-            Dead_Terpios = sd(Dead_Terpios),
+            Dead_Sponge = sd(Dead_Sponge),
             Dead_Turf = sd(Dead_Turf),
             Health = sd(Health),
             Partly_Bleached = sd(Partly_Bleached))
@@ -479,3 +482,4 @@ ggplot(AT.bleaching.rad, aes(x = var, y = AT.pre.bleaching.per.mean, group = 1))
   theme() + 
   coord_polar() +
   labs(x = "", y = "")
+

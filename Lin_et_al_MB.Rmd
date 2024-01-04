@@ -1,7 +1,7 @@
 ---
 title: "Lin et al MesoBleach"
 author: "Yuting Vicky Lin"
-date: "2023-11-14"
+date: "2024-01-04"
 output: 
   html_document:
     toc_float: true
@@ -9,9 +9,9 @@ output:
     toc_depth: 3
     number_sections: true
 ---
-Data and script to replicate analyses in Lin et al. (XXX). If used in full or in part, please cite the original publication: 
+Data and script to replicate analyses in Lin et al. (submitted). If used in full or in part, please cite the original publication: 
 
-Lin YV, Chen YL, De Palmas S, Denis V (submitted) Rapid switch in coral assemblage caused by bleaching at upper mesophotic depth. doi:  []()
+Lin YV, Chen YL, De Palmas S, Carballo-Bolaños R, Guerbet A, Ribas-Deulofeu L, Tsai CB, Wei Y, Denis V (submitted) Rapid shift in benthic assemblages due to coral bleaching in upper mesophotic depths. doi:  []()
 
 Raw data also available on [Dryad](https://)
 
@@ -39,7 +39,6 @@ library(rnaturalearthdata)
 library(sf)
 library(grid)
 library(marmap)
-
 ```
 
 # **Generate R Script**
@@ -48,7 +47,7 @@ library(marmap)
 knitr::purl("Lin_et_al_MB.Rmd", documentation = F)
 ```
 
-# **Description of the sampling site - Vanice**
+# **Description of the sampling site - Venice**
 ## **Figure 1a - world map**
 ```{r eval = TRUE, echo=T, message=F, warning=F}
 world <- ne_countries(scale = "medium", returnclass = "sf")
@@ -89,21 +88,20 @@ ggplot(data = TW.df.sf) +
 ```
 
 
-## **Figure 1c - depth profile of Vanice**
+## **Figure 1c - depth profile of Venice**
 ```{r eval = TRUE, echo=T, message=F, warning=F}
 Van <- getNOAA.bathy(lon1 = 120, lon2 = 121, lat1 = 22, lat2 = 23, 
                      resolution = 0.1) # download the bathymetric data
-trsect <- get.transect(Van, 120.31000, 22.33635, 120.36000, 22.33635, distance = TRUE) # add the transect to extract depth profile
+trsect <- get.transect(Van, 120.32000, 22.337, 120.3500, 22.337, distance = TRUE) # add the transect to extract depth profile
 head(trsect) # check the information of transects
 plotProfile(trsect) # plot the depth profile
-
 ```
 
 
-# **Thermal environment**
-## **Extract thermal data at the sampling site**
+# **Temperature of Venice**
+## **Extract temperature data at the sampling site**
 ```{r eval = TRUE, echo=T, message=F, warning=F}
-SST <- nc_open('Data/dhw_5km_XLQ_20222023.nc') # open the nc file
+SST <- nc_open('Data/dhw_5km_XLQ_20222023_full.nc') # open the nc file
 sst <-'CRW_SST' # get SST variables
 DHW <- 'CRW_DHW' # get DHW variables
 BAA <- 'CRW_BAA' # get BAA variables
@@ -125,7 +123,7 @@ dim(BAA_array)
 nc_close(SST) # close the nc file
 ```
 
-## **Tidy the thermal data**
+## **Compile the temperature data**
 ```{r eval = TRUE, echo=T, message=F, warning=F}
 sst.poi <- as.matrix(sst_array) # extract SST data of the sampling site
 DHW.poi <- as.matrix(DHW_array) # extract DHW data of the sampling site
@@ -136,8 +134,8 @@ BAA.df <- data.frame(date, BAA.poi) # create a dataframe for BAA of the sampling
 df <- data.frame(date, sst.poi, DHW.poi, BAA.poi) # combine 3 dataframes
 ```
 
-## **Statistic of thermal data used in the manuscript**
-### 2022 & 2023 mean SD SST
+## **Statistic of temperature data used in the manuscript**
+### 2022 & 2023 mean & SD SST
 ```{r eval = TRUE, echo=T, message=F, warning=F}
 round(mean(sst.poi[1:365]),1)
 round(sd(sst.poi[1:365]),1)
@@ -145,21 +143,21 @@ round(mean(sst.poi[366:614]),1)
 round(sd(sst.poi[366:614]),1)
 ```
 
-### 2022 & 2023 summer (Jul + Aug) mean SD SST
+### 2022 & 2023 summer (June - September) mean & SD SST
 ```{r eval = TRUE, echo=T, message=F, warning=F}
-round(mean(sst.poi[181:242]),1)
-round(sd(sst.poi[181:242]),1)
-round(mean(sst.poi[546:607]),1)
-round(sd(sst.poi[546:607]),1)
+round(mean(sst.poi[151:272]),1)
+round(sd(sst.poi[151:272]),1)
+round(mean(sst.poi[516:637]),1)
+round(sd(sst.poi[516:637]),1)
 ```
 
-### DHW peak in 2022 and 2023
+### DHW peaks in 2022 and 2023
 ```{r eval = TRUE, echo=T, message=F, warning=F}
 round(max(DHW.poi[1:365]),1)
 round(max(DHW.poi[366:614]),1)
 ```
 
-## **Figure 2 - thermal data in 2022 & 2023**
+## **Figure 2 - temperature data in 2022 & 2023**
 ```{r eval = TRUE, echo=T, message=F, warning=F}
 ggplot(data = df)+
   xlab('Date')+
@@ -179,7 +177,7 @@ ggplot(data = df)+
   geom_area(data = filter(df, BAA.poi == 4& date > '2022-12-30'), aes(x = date, y = DHW.poi*2), fill = "darkred", alpha = 0.8) +
   scale_y_continuous(name = "Temperature (°C)", breaks=c(0, 5, 10, 15, 20, 25, 30), labels=c(6, 11, 16 ,21, 26, 31, 36), limits=c(0,25),
                      sec.axis = sec_axis(~./2, name="DHW (°C-weeks)"), expand = c(0,0))+
-  scale_x_date(breaks = date_breaks("1 month"), limits = as.Date(c('2022-01-01','2023-10-30')), date_labels="%b")+
+  scale_x_date(breaks = date_breaks("1 month"), limits = as.Date(c('2022-01-01','2023-12-31')), date_labels="%b")+
   theme_bw()
 ```
 
@@ -189,7 +187,7 @@ ggplot(data = df)+
 benthic_data <- read.csv('Data/benthic_data.csv', sep = ',', header = T)
 ```
 
-## **Major benthic categories absolute covers**
+## **Covers for major benthic categories**
 ```{r eval = TRUE, echo=T, message=F, warning=F}
 maj <- t(aggregate(benthic_data[,-c(1,2,3,10)], list(benthic_data$Major_cate), sum))
 maj.lab <- maj[1,]
@@ -206,7 +204,7 @@ maj.yr <- maj.cov %>%
             Other.life = sum(Other_live),
             Soft.corals = sum(Soft_corals),
             Sponges = sum(Sponges),
-            Turf = sum(Turf_cyanobacteria))
+            Turf = sum(Turf))
 maj.yr.2022 <- 100 * (as.numeric(maj.yr[1,2:9])/sum(as.numeric(maj.yr[1,2:9])))
 maj.yr.2023 <- 100 * (as.numeric(maj.yr[2,2:9])/sum(as.numeric(maj.yr[2,2:9])))
 maj.yr <- round(rbind(maj.yr.2022,maj.yr.2023),1) # cover matrix
@@ -214,7 +212,7 @@ colnames(maj.yr) <- maj.lab
 row.names(maj.yr) <- c('2022','2023')
 ```
 
-## **Major benthic categories absolute covers with corals' bleaching status**
+## **Covers for major benthic categories with coral bleaching status**
 ```{r eval = TRUE, echo=T, message=F, warning=F}
 maj.ble <- benthic_data[,-c(2,10)]
 maj.ble$maj.ble <- with(maj.ble, paste(Major_cate, Bleached_status, sep = "_"))
@@ -238,27 +236,28 @@ rownames(maj.ble.2223) <- c('2022','2023')
 
 
 
-## **Figure 4a - Major benthic categories absolute covers**
+## **Figure 4a - Covers for major benthic categories**
 ```{r eval = TRUE, echo=T, message=F, warning=F}
-maj.ble.seq <- c("Algae_",                                  
-                 "Bare_substrate_",   
+maj.ble.seq <- c("Turf_" ,
+                 "Turf_Dead_Turf" ,
+                 "Algae_", 
+                 "CCA_", 
                  "CCA_Dead_CCA",  
-                 "CCA_",                                    
-                 "Hard_corals_Bleached",                    
-                 "Hard_corals_Partly_Bleached",   
                  "Hard_corals_Health",
-                 "Other_live_",                             
-                 "Soft_corals_Bleached",                    
-                 "Soft_corals_Partly_Bleached" ,   
+                 "Hard_corals_Partly_Bleached", 
+                 "Hard_corals_Bleached",  
                  "Soft_corals_Health",
-                 "Sponges_Dead_Terpios"  ,      
+                 "Soft_corals_Partly_Bleached" ,  
+                 "Soft_corals_Bleached",  
                  "Sponges_" ,
-                 "Turf_cyanobacteria_Dead_Endolithic_Algae",
-                 "Turf_cyanobacteria_Dead_Turf" ,
-                 "Turf_cyanobacteria_" )
+                 "Sponges_Dead_Sponge"  , # Sponges_on_dead_corals
+                 "Other_live_",   
 
-maj.ble.col <- c('#66c2a5','#b3b3b3',"#E78AC399",'#e78ac3',"#8DA0CB66","#8DA0CBB3",'#8da0cb',
-                 '#fc8d62',"#E5C49499","#E5C494CC",'#e5c494',"#FFD92FB3",'#ffd92f',"#A6D85466","#A6D854B3",'#a6d854')
+                 "Bare_substrate_",   
+                 "Bare_substrate_Dead_Endolithic_Algae")
+
+maj.ble.col <- c('#a6d854',"#A6D854B3", '#66c2a5','#e78ac3',"#E78AC399",'#8da0cb',"#8DA0CBB3","#8DA0CB66",
+                 '#e5c494',"#E5C494CC","#E5C49499",'#ffd92f',"#FFD92FB3",'#fc8d62','#b3b3b3' ,"#B3B3B3B3" )
 maj.ble.yr.long <- gather(maj.ble.yr, Year, Absolute_cover, X2022, X2023, factor_key=TRUE)
 Major_Category <- factor(maj.ble.yr.long$Major_Category_Bleached, levels = maj.ble.seq)
 Year. <- factor(maj.ble.yr.long$Year , levels = c('X2023','X2022'))
@@ -270,49 +269,50 @@ ggplot(maj.ble.yr.long, aes(fill = Major_Category, y = Absolute_cover, x = Year.
 ```
 
 
-## **Comparing benthic composition between 2022 & 2023 (transect level)**
+## **Comparing benthic composition between 2022 & 2023**
 ```{r eval = TRUE, echo=T, message=F, warning=F}
 maj.per.yr <- (maj.cov[,-9]/rowSums(maj.cov[,-9]))*100
 maj.per.yr$Year <- c(rep('2022',3),rep('2023',3))
 
 maj.per.yr.mean1 <- maj.per.yr %>%
   group_by(Year) %>%
-  summarise(Algae = mean(Algae),
-            Bare.substrate = mean(Bare_substrate),
+  summarise(Macroalgae = mean(Algae),
+            Bare.substrates = mean(Bare_substrate),
             CCA = mean(CCA),
-            Hard.corals = mean(Hard_corals),
+            Stony.corals = mean(Hard_corals),
             Other.life = mean(Other_live),
             Soft.corals = mean(Soft_corals),
             Sponges = mean(Sponges),
-            Turf = mean(Turf_cyanobacteria))
+            Turf.algae = mean(Turf))
 maj.per.yr.mean <- gather(maj.per.yr.mean1, maj, value = 'cover', 2:9)
 
 maj.per.yr.sd <- maj.per.yr %>%
   group_by(Year) %>%
-  summarise(Algae = sd(Algae),
-            Bare.substrate = sd(Bare_substrate),
+  summarise(Macroalgae = sd(Algae),
+            Bare.substrates = sd(Bare_substrate),
             CCA = sd(CCA),
-            Hard.corals = sd(Hard_corals),
+            Stony.corals = sd(Hard_corals),
             Other.life = sd(Other_live),
             Soft.corals = sd(Soft_corals),
             Sponges = sd(Sponges),
-            Turf = sd(Turf_cyanobacteria))
+            Turf.algae = sd(Turf))
 maj.per.yr.sd <- gather(maj.per.yr.sd, maj, value = 'cover', 2:9)
-maj.per.yr.bar <- cbind(maj.per.yr.mean[,1:2], round(maj.per.yr.mean$cover,1), round(maj.per.yr.sd$cover,1)) # benthic mean cover & SD
+maj.per.yr.bar <- cbind(maj.per.yr.mean[,1:2], maj.per.yr.mean$cover, maj.per.yr.sd$cover) # benthic mean cover & SD
 colnames(maj.per.yr.bar) <- c('Year', 'Major', 'Cover', 'SD')
 ```
 
 ## **Supplementary Information 2 - benthic composition comparison**
 ```{r eval = TRUE, echo=T, message=F, warning=F}
-maj.col <- c('#66c2a5','#b3b3b3','#e78ac3','#8da0cb','#fc8d62','#e5c494','#ffd92f','#a6d854')
+maj.col <- c('#b3b3b3','#e78ac3','#66c2a5','#8da0cb','#fc8d62','#ffd92f','#e5c494','#a6d854')
 ggplot(maj.per.yr.bar, aes(x = Year, y = Cover, fill = Major)) +
   geom_bar(stat = "identity") +
   geom_errorbar(aes(ymin = Cover-SD, ymax = Cover+SD), position =  "dodge", width = 0.2) +
-  facet_wrap(~Major, scales = "free")+
-  scale_fill_manual(values = maj.col)
+  facet_wrap(~Major, scales = "free_y")+
+  scale_fill_manual(values = maj.col) + 
+  scale_y_continuous(expand = expansion(mult = c(0.1, 0.2)))
 ```
 
-# **Temporal changes in the coral assemblage**
+# **Coral covers in 2022 and 2023**
 ```{r eval = TRUE, echo=T, message=F, warning=F}
 HC <- benthic_data %>% filter(Major_cate=='Hard_corals')
 SC <- benthic_data %>% filter(Major_cate=='Soft_corals')
@@ -372,7 +372,7 @@ coral.per.yr.bar <- cbind(col.per.yr.mean[,1:2], round(col.per.yr.mean$cover,1),
 colnames(coral.per.yr.bar) <- c('Year', 'Coral', 'Cover', 'SD')
 ```
 
-## **Figure 4b - Changes in coral relative covers**
+## **Figure 4b - Coral covers in 2022 and 2023**
 ```{r eval = TRUE, echo=T, message=F, warning=F}
 Coral_long <- gather(Coral, Transect, Relative_cover, X2022_T1, X2022_T2, X2022_T3, X2023_T1, X2023_T2, X2023_T3, factor_key=TRUE)
 Coral_long.seq <- c("Acropora_tenella_branching",          
@@ -421,7 +421,7 @@ ggplot(Coral.yr.long, aes(fill = Coral.seq.yr, y = Relative_cover, x = Year.)) +
   theme_classic()
 ```
 
-# **Temporal change in coral bleaching status (transect level)**
+# **Coral bleaching status in 2022 and 2023**
 ```{r eval = TRUE, echo=T, message=F, warning=F}
 bleaching <- t(aggregate(benthic_data[,-c(1,2,3,10)], list(benthic_data$Bleached_status), sum))
 bleaching <- bleaching[,-1]; colnames(bleaching) <- bleaching[1,]
@@ -484,7 +484,7 @@ bleaching.coral <- rbind(post.bleaching.2022,post.bleaching.2023)
 ```
 
 
-## **Figure 5a - Change in coral bleaching status**
+## **Figure 5a - Coral bleaching status in 2022 and 2023**
 ```{r eval = TRUE, echo=T, message=F, warning=F}
 var <- colnames(pre.bleaching.per)
 pre.mean <- t(pre.bleaching.mean)
@@ -510,7 +510,7 @@ ggplot(bleaching.rad, aes(x = var, y = pre.mean, group = 1)) +
   labs(x = "", y = "")
 ```
 
-# **Temporal change in bleaching status of _A. tenella_ (transect level)**
+# **Bleaching status of _A. tenella_ in 2022 and 2023**
 ```{r eval = TRUE, echo=T, message=F, warning=F}
 AT.coral <- benthic_data[c(1:7),c(4:9)]
 AT.coral <- t(AT.coral)
@@ -533,7 +533,7 @@ AT.bleaching <- data.frame(c(rep('2022',7),rep('2023',7)), rbind(AT.pre.bleachin
 colnames(AT.bleaching) <- c('year','mean','sd')
 ```
 
-## **Figure 5b - Change in bleaching status of _A. tenella_ between 2022 & 2023**
+## **Figure 5b - Bleaching status of _A. tenella_ between 2022 & 2023**
 ```{r eval = TRUE, echo=T, message=F, warning=F}
 AT.pre.upper <- as.numeric(AT.pre.bleaching.per.mean + AT.pre.bleaching.per.sd)
 AT.pre.lower <- as.numeric(AT.pre.bleaching.per.mean - AT.pre.bleaching.per.sd)
