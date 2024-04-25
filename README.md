@@ -1,8 +1,3 @@
-<p align="center">
-  <img alt="logo" src="./Data/Linetal_Figure 3.png" width="100%">
-&nbsp; &nbsp; &nbsp; &nbsp;
-</p>
-
 # Data from: Rapid shift in benthic assemblages following coral bleaching at an upper mesophotic habitat in Taiwan
 
 ---
@@ -74,25 +69,25 @@ Lin YV, Chen YL, De Palmas S, Carballo-Bolaños R, Guerbet A, Ribas-Deulofeu L, 
 2. **File List**
 
   + File 1: Linetal_dataset_Benthic.csv
-  + File 1 description: benthic and bleaching annoatated points of the 6 sampling transects in 2022 and 2023, respectively
+    + File 1 description: benthic and bleaching annoatated points of the 6 sampling transects in 2022 and 2023, respectively
 
   + File 2: Linetal_dataset_dhw_5km_XLQ.nc
-  + File 2 description: daily temperature and degree heating week data in Venice, Xiaoliuqiu in 2022 and 2023, respectively
+    + File 2 description: daily temperature and degree heating week data in Venice, Xiaoliuqiu in 2022 and 2023, respectively
 
   + File 3: Linetal_dataset_TWN_adm0.shp
-  + File 3 description: file of Taiwan map used to generate Figure 1b
+    + File 3 description: file of Taiwan map used to generate Figure 1b
 
   + File 4: Linetal_dataset_TWN_adm0.cpg
-  + File 4 description: file of Taiwan map used to generate Figure 1b
+    + File 4 description: file of Taiwan map used to generate Figure 1b
 
   + File 5: Linetal_dataset_TWN_adm0.dbf
-  + File 5 description: file of Taiwan map used to generate Figure 1b
+    + File 5 description: file of Taiwan map used to generate Figure 1b
 
   + File 6: Linetal_dataset_TWN_adm0.prj
-  + File 6 description: file of Taiwan map used to generate Figure 1b
+    + File 6 description: file of Taiwan map used to generate Figure 1b
 
   + File 7: Linetal_dataset_TWN_adm0.shx
-  + File 7 description: file of Taiwan map used to generate Figure 1b
+    + File 7 description: file of Taiwan map used to generate Figure 1b
 
 
 ### METHODOLOGICAL INFORMATION
