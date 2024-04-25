@@ -92,7 +92,7 @@ Lin YV, Chen YL, De Palmas S, Carballo-Bolaños R, Guerbet A, Ribas-Deulofeu L, 
 
 ### METHODOLOGICAL INFORMATION
 
-    A detailed description of data acquisition and processing can be found in the published manuscript in the XXX (https://doi.org/XXX).
+   A detailed description of data acquisition and processing can be found in the published manuscript in the XXX (https://doi.org/XXX)
 
 
 #### DATA-SPECIFIC INFORMATION
